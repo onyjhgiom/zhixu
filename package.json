@@ -1,0 +1,20 @@
+{
+  "name": "zhixu-computer-learning",
+  "version": "0.1.0",
+  "private": true,
+  "description": "知序 · 计算机学习与考研成长空间",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "node tests/browser.mjs",
+    "test:visual": "node tests/visual.mjs",
+    "test:theme": "node tests/theme.mjs",
+    "test:motion": "node tests/motion.mjs",
+    "test:fluid": "node tests/fluid.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b15">
+  <meta name="description" content="知序：计算机技术学习路线、岗位学习资料、公司笔试面试专题与考研备考规划。让每一步学习都有方向。">
+  <title>知序 · 计算机成长空间</title>
+  <script>
+    // Resolve before paint so a saved theme never flashes the opposite palette.
+    (() => {
+      let preference;
+      try { preference = localStorage.getItem('zhixu-theme-v1'); } catch {}
+      const theme = ['dark', 'light'].includes(preference) ? preference : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#f2f4fc' : '#090b15';
+    })();
+  </script>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳转到主要内容</a>
+  <aside class="sidebar" id="sidebar" aria-label="主导航">
+    <a class="brand" href="#home" aria-label="知序首页"><span class="brand-mark" aria-hidden="true">&lt;/&gt;</span><span><strong>知序<span class="brand-dot">.</span></strong><small>COMPUTER SCIENCE / LAB</small></span></a>
+    <div class="side-label"><span>01 / EXPLORE</span> 学习导航</div>
+    <nav id="main-nav"></nav>
+    <div class="side-label space-label"><span>02 / WORKSPACE</span> 我的空间</div>
+    <nav id="personal-nav"></nav>
+    <div class="side-bottom">
+      <div class="seed-icon" data-icon="terminal"></div>
+      <strong>把好奇，编译成能力。</strong>
+      <p>从知识输入，到实践输出。</p>
+      <button class="side-link" data-action="guide">找到适合我的学习路线 <span>↗</span></button>
+    </div>
+    <div class="local-profile"><span class="avatar">知</span><span><b>我的学习空间</b><small>LOCAL WORKSPACE</small></span><span class="status-dot" title="记录保存在当前浏览器"></span></div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay" hidden></div>
+  <div class="shell">
+    <header class="topbar">
+      <button class="icon-button mobile-menu" id="mobile-menu" aria-label="展开导航" aria-expanded="false" data-icon="menu"></button>
+      <div class="breadcrumb"><span>学习空间</span><span>/</span><strong id="page-title">学习概览</strong></div>
+      <div class="top-actions">
+        <form class="global-search" id="global-search" role="search"><span data-icon="search"></span><input id="search-input" aria-label="搜索学习方向、资料或面试专题" placeholder="搜索你想学的内容…" autocomplete="off" maxlength="100"><kbd>/</kbd></form>
+        <button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换到浅色模式" aria-pressed="true" title="切换到浅色模式">
+          <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+          <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.1A8.7 8.7 0 0 1 10.9 3.5 8.7 8.7 0 1 0 20.5 13.1Z"/></svg>
+          <span class="theme-label">深色</span><span class="theme-switch-track" aria-hidden="true"><i></i></span>
+        </button>
+        <button class="icon-button" data-action="saved" aria-label="查看我的收藏" data-icon="bookmark"></button>
+        <span class="top-divider"></span>
+        <button class="top-help" data-action="guide"><span data-icon="compass"></span><span>学习指引</span></button>
+      </div>
+    </header>
+    <main id="content" tabindex="-1"></main>
+    <footer><span>知序 · 让每一步学习都有方向</span><span>STAY CURIOUS. KEEP BUILDING. <span class="footer-sprout">✳</span></span></footer>
+  </div>
+  <dialog id="detail-dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

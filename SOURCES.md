@@ -83,3 +83,37 @@
 | [人工智能的数学基础（中文编译）](https://github.com/datawhalechina/math-for-ai) | Datawhale / 社区编译教材 | 机器学习、深度学习、计算机基础 | HTTP 200 |
 | [LLM Cookbook：大模型应用中文手册](https://github.com/datawhalechina/llm-cookbook) | Datawhale / 课程翻译与复现 | Agent 开发、大模型后训练 | HTTP 200 |
 | [MMPreTrain 中文训练教程](https://mmpretrain.readthedocs.io/zh-cn/latest/) | OpenMMLab / 官方文档 | 深度学习 | HTTP 200 |
+
+
+## 项目实践示例（2026-10-19）
+
+24 个仓库通过 GitHub 公开仓库 API 核对访问状态、仓库名称、简介与归档状态，均返回 HTTP 200；LlamaFactory 使用 API 返回的规范地址。项目练习任务和交付建议为本站编写，不表示仓库维护者提供课程或实习。链接访问核验不等于已逐一安装运行全部项目。
+
+| 项目 | 仓库 | 所属地区口径 |
+| --- | --- | --- |
+| Dify · AI 应用与知识库工作流 | https://github.com/langgenius/dify | 全球协作 |
+| LangChain · 工具调用型助手 | https://github.com/langchain-ai/langchain | 全球协作 |
+| ML for Beginners · 机器学习实验集 | https://github.com/microsoft/ML-For-Beginners | 美国 · 雷德蒙德（发起机构所在地） |
+| PyTorch Examples · 神经网络训练实验 | https://github.com/pytorch/examples | 全球协作 |
+| nanoGPT · 小型语言模型预训练 | https://github.com/karpathy/nanoGPT | 全球协作 |
+| LlamaFactory · 指令微调实践 | https://github.com/hiyouga/LlamaFactory | 全球协作 |
+| TRL · 偏好优化对照实验 | https://github.com/huggingface/trl | 全球协作 |
+| Vue Core · 响应式机制与组件实验 | https://github.com/vuejs/core | 全球协作 |
+| Mall · 电商交易系统 | https://github.com/macrozheng/mall | 全球协作 |
+| Full Stack FastAPI · 全栈任务管理 | https://github.com/fastapi/full-stack-fastapi-template | 全球协作 |
+| Playwright · 端到端质量保障 | https://github.com/microsoft/playwright | 美国 · 雷德蒙德（发起机构所在地） |
+| Prometheus · 服务可观测性实验 | https://github.com/prometheus/prometheus | 全球协作 |
+| The Algorithms · 算法验证实验 | https://github.com/TheAlgorithms/Python | 全球协作 |
+| xv6 RISC-V · 操作系统内核实验 | https://github.com/mit-pdos/xv6-riscv | 美国 · 剑桥（发起机构所在地） |
+| Appsmith · 内部工具产品原型 | https://github.com/appsmithorg/appsmith | 全球协作 |
+| Apache Superset · 数据分析看板 | https://github.com/apache/superset | 全球协作 |
+| OWASP Juice Shop · Web 安全靶场 | https://github.com/juice-shop/juice-shop | 全球协作 |
+| Kubernetes · 应用编排与弹性部署 | https://github.com/kubernetes/kubernetes | 全球协作 |
+| Apache Flink · 实时数据管道 | https://github.com/apache/flink | 全球协作 |
+| Zephyr · 嵌入式实时系统入门 | https://github.com/zephyrproject-rtos/zephyr | 全球协作 |
+| OpenCV · 图像处理与视觉流水线 | https://github.com/opencv/opencv | 全球协作 |
+| Apache Dubbo · RPC 服务治理 | https://github.com/apache/dubbo | 全球协作 |
+| ncnn · 移动端视觉模型推理 | https://github.com/Tencent/ncnn | 中国 · 深圳（发起机构所在地） |
+| Spring Cloud Alibaba · 微服务协作实验 | https://github.com/alibaba/spring-cloud-alibaba | 中国 · 杭州（发起机构所在地） |
+
+机构地区来源：Tencent（Shenzhen, China）：https://github.com/Tencent；Alibaba（Hangzhou, China）：https://github.com/alibaba；Microsoft（Redmond, WA）：https://github.com/microsoft；MIT PDOS（Cambridge, MA）：https://github.com/mit-pdos。地点取自公开组织档案，未从项目语言、名称或维护者姓名推测所在地。其余条目统一标为全球协作。

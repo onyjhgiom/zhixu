@@ -9,7 +9,8 @@ try { browser=await chromium.launch({channel:'msedge',headless:true}); }
 catch { browser=await chromium.launch({channel:'chrome',headless:true}); }
 const page=await browser.newPage({viewport:{width:1440,height:1080},deviceScaleFactor:1});
 const errors=[];page.on('pageerror',err=>errors.push(err.message));
-async function navigate(hash){await page.goto('http://127.0.0.1:4173/#'+hash);await page.locator('#content h1').waitFor();}
+const testBase=process.env.TEST_BASE_URL || 'http://127.0.0.1:4173';
+async function navigate(hash){await page.goto(testBase+'/#'+hash);await page.locator('#content h1').waitFor();}
 async function noOverflow(){assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),`horizontal overflow at ${await page.url()}`);const shortcut=page.locator('.resource-language-shortcut');if(await shortcut.count()){const box=await shortcut.boundingBox();assert.ok(box.height<70,'resource language shortcut should remain a readable horizontal button');}}
 try {
   await navigate('home');

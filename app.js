@@ -1,10 +1,12 @@
 import { createCareer } from './career-ui.js';
+import { createProjects } from './project-ui.js';
 import { paths, categories, resources, examTopics, examLinks, helpServices } from './data.js';
 import { escapeHtml as e, matchesQuery, progressFor, sanitizeState, buildExamPlan } from './core.js';
 let disposeHomeMotion = () => {};
 let disposeFluidMotion = () => {};
 let fluidSystem;
 const icons = {
+  pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
   compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/>',
   branch:'<circle cx="6" cy="5" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="19" r="2"/><path d="M6 7v10m0-6c8 0 12 0 12-3"/>',
@@ -48,14 +50,15 @@ let lastFocus, toastTimer;
 const dialog = document.getElementById('detail-dialog');
 const content = document.getElementById('content');
 const career=createCareer({paths,resources,resourceRow,icon,e,toast,go,closeDialog,exportFile});
-const titles = {interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
+const projectLab=createProjects({paths,icon,e,closeDialog});
+const titles = {projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
 function route() { return location.hash.slice(1).split('?')[0] || 'home'; }
 function query() { return new URLSearchParams(location.hash.split('?')[1] || '').get('q') || ''; }
 function toast(text) { const el=document.getElementById('toast'); el.textContent=text;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3000); }
 function persist() { try { localStorage.setItem(storageKey,JSON.stringify(state));storageAvailable=true;return true; } catch { storageAvailable=false;toast('浏览器未能保存记录，当前操作仅在本次页面停留期间有效。');return false; } }
 function go(page) { if(location.hash === `#${page}`) render();else location.hash=page; }
 function nav() {
-  const primary=[['home','grid','学习概览'],['tech','code','技术成长'],['roadmaps','branch','学习路线'],['resources','book','资料库'],['interviews','users','求职面试'],['exam','cap','考研升学'],['support','users','考研帮扶']];
+  const primary=[['home','grid','学习概览'],['tech','code','技术成长'],['roadmaps','branch','学习路线'],['resources','book','资料库'],['projects','code','项目实践'],['interviews','users','求职面试'],['exam','cap','考研升学'],['support','users','考研帮扶']];
   const personal=[['learning','calendar','我的学习'],['saved','bookmark','我的收藏']];
   const link=([id,i,title])=>`<a href="#${id}" class="nav-item ${route()===id?'active':''}" ${route()===id?'aria-current="page"':''}>${icon(i)}<span>${title}</span>${id==='saved'&&state.saved.length?`<span class="nav-count">${state.saved.length}</span>`:''}</a>`;
   document.getElementById('main-nav').innerHTML=primary.map(link).join('');document.getElementById('personal-nav').innerHTML=personal.map(link).join('');document.getElementById('page-title').textContent=titles[route()] || titles.home;
@@ -77,7 +80,7 @@ function rail() {
 function home() {
   const date=new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',month:'long',day:'numeric',weekday:'long'}).format(new Date());
   const visible=paths.filter(p=>activeCategory==='all'||p.category===activeCategory).slice(0,6);
-  return `<div class="welcome-row"><div><h1>你的下一次进阶，从这里开始。</h1><p>欢迎来到知序。连接知识、代码与下一种可能。</p></div><div class="date-line">${icon('calendar')}<span>${e(date)}</span></div></div><section class="hero" aria-label="探索计算机学习"><div><div class="eyebrow hero-eyebrow"><span class="signal-dot"></span> THE NEXT INTERFACE OF LEARNING <span class="hero-edition">VOL. 02</span></div><h2>以代码探索世界，<br>以技术<em>定义未来。</em></h2><p>从第一行代码，到下一代 AI。<br>让系统的学习路线，连接你的每一次突破。</p><div class="hero-domains"><span>AI & AGENT</span><span>FULL-STACK</span><span>CS FUNDAMENTALS</span></div><div class="hero-actions"><a class="btn btn-primary" href="#tech">探索技术方向 ${icon('arrow')}</a><a class="btn btn-secondary" href="#exam">${icon('cap')}开启考研之路</a></div><div class="hero-motion-controls"><span><i></i> INTERACTIVE KNOWLEDGE SPACE</span><button type="button" id="motion-toggle" aria-pressed="false">暂停动效 <span aria-hidden="true">Ⅱ</span></button></div></div>${art()}<div class="hero-aurora" aria-hidden="true"><i></i><i></i></div><div class="hero-light-sweep" aria-hidden="true"></div><canvas class="hero-network" aria-hidden="true"></canvas><div class="hero-spotlight" aria-hidden="true"></div></section>${stats()}${career.preview('agent')}<div class="content-columns"><div><section><div class="section-heading"><div><h2>发现你的技术方向</h2><p>从兴趣出发，让每一份努力都有方向。</p></div><a class="text-link" href="#tech">全部方向 ${icon('arrow')}</a></div>${tabs()}<div class="path-grid">${visible.map(p=>card(p)).join('')}</div></section><section class="resource-preview"><div class="section-heading"><div><h2>值得打开的好资料</h2><p>从开放课程与官方文档开始，边学边实践。</p></div><a class="text-link" href="#resources">查看资料库 ${icon('arrow')}</a></div><div class="resource-list">${[resources[0],resources[5],resources[10]].map(r=>resourceRow(r)).join('')}</div></section></div>${rail()}</div>`;
+  return `<div class="welcome-row"><div><h1>你的下一次进阶，从这里开始。</h1><p>欢迎来到知序。连接知识、代码与下一种可能。</p></div><div class="date-line">${icon('calendar')}<span>${e(date)}</span></div></div><section class="hero" aria-label="探索计算机学习"><div><div class="eyebrow hero-eyebrow"><span class="signal-dot"></span> THE NEXT INTERFACE OF LEARNING <span class="hero-edition">VOL. 02</span></div><h2>以代码探索世界，<br>以技术<em>定义未来。</em></h2><p>从第一行代码，到下一代 AI。<br>让系统的学习路线，连接你的每一次突破。</p><div class="hero-domains"><span>AI & AGENT</span><span>FULL-STACK</span><span>CS FUNDAMENTALS</span></div><div class="hero-actions"><a class="btn btn-primary" href="#tech">探索技术方向 ${icon('arrow')}</a><a class="btn btn-secondary" href="#exam">${icon('cap')}开启考研之路</a></div><div class="hero-motion-controls"><span><i></i> INTERACTIVE KNOWLEDGE SPACE</span><button type="button" id="motion-toggle" aria-pressed="false">暂停动效 <span aria-hidden="true">Ⅱ</span></button></div></div>${art()}<div class="hero-aurora" aria-hidden="true"><i></i><i></i></div><div class="hero-light-sweep" aria-hidden="true"></div><canvas class="hero-network" aria-hidden="true"></canvas><div class="hero-spotlight" aria-hidden="true"></div></section>${stats()}${projectLab.preview()}${career.preview('agent')}<div class="content-columns"><div><section><div class="section-heading"><div><h2>发现你的技术方向</h2><p>从兴趣出发，让每一份努力都有方向。</p></div><a class="text-link" href="#tech">全部方向 ${icon('arrow')}</a></div>${tabs()}<div class="path-grid">${visible.map(p=>card(p)).join('')}</div></section><section class="resource-preview"><div class="section-heading"><div><h2>值得打开的好资料</h2><p>从开放课程与官方文档开始，边学边实践。</p></div><a class="text-link" href="#resources">查看资料库 ${icon('arrow')}</a></div><div class="resource-list">${[resources[0],resources[5],resources[10]].map(r=>resourceRow(r)).join('')}</div></section></div>${rail()}</div>`;
 }
 function technology(roadmap=false) {
   const list=paths.filter(p=>activeCategory==='all'||p.category===activeCategory);
@@ -104,12 +107,12 @@ function learningPage() {
 }
 function searchPage() {
   const q=query().trim();if(!q) return empty('输入你想学习的内容','可以搜索「Agent」「机器学习」「前端」或资料名称。');
-  const foundCareer=career.search(q);
+  const foundCareer=career.search(q), foundProjects=projectLab.search(q);
   const foundPaths=paths.filter(p=>matchesQuery(p,q)), foundResources=resources.filter(r=>matchesQuery({...r,tags:r.paths.map(id=>itemById(id)?.title||'')},q)), foundExam=examTopics.filter(p=>matchesQuery(p,q));
-  return `<div class="page-header"><div><h1>搜索 <span class="query-label">“${e(q)}”</span></h1><p>找到 ${foundPaths.length} 条技术路线、${foundResources.length} 份资料、${foundExam.length} 个考研专题与 ${foundCareer.count} 项求职内容。</p></div><button class="btn btn-secondary" data-action="clear-search">清除搜索 ${icon('close')}</button></div>${foundPaths.length?`<h2 class="search-heading">技术学习路线</h2><div class="path-grid">${foundPaths.map(p=>card(p)).join('')}</div>`:''}${foundResources.length?`<h2 class="search-heading">学习资料</h2><div class="resource-list">${foundResources.map(r=>resourceRow(r,true)).join('')}</div>`:''}${foundExam.length?`<h2 class="search-heading">考研知识梳理</h2><div class="path-grid">${foundExam.map(p=>card(p)).join('')}</div>`:''}${foundCareer.markup}${!foundPaths.length&&!foundResources.length&&!foundExam.length&&!foundCareer.count?empty('还没有找到相关内容','试试更简短的关键词，或浏览所有学习方向。'):''}`;
+  return `<div class="page-header"><div><h1>搜索 <span class="query-label">“${e(q)}”</span></h1><p>找到 ${foundPaths.length} 条技术路线、${foundResources.length} 份资料、${foundExam.length} 个考研专题、${foundProjects.count} 个实践项目与 ${foundCareer.count} 项求职内容。</p></div><button class="btn btn-secondary" data-action="clear-search">清除搜索 ${icon('close')}</button></div>${foundPaths.length?`<h2 class="search-heading">技术学习路线</h2><div class="path-grid">${foundPaths.map(p=>card(p)).join('')}</div>`:''}${foundResources.length?`<h2 class="search-heading">学习资料</h2><div class="resource-list">${foundResources.map(r=>resourceRow(r,true)).join('')}</div>`:''}${foundExam.length?`<h2 class="search-heading">考研知识梳理</h2><div class="path-grid">${foundExam.map(p=>card(p)).join('')}</div>`:''}${foundProjects.markup}${foundCareer.markup}${!foundPaths.length&&!foundResources.length&&!foundExam.length&&!foundCareer.count&&!foundProjects.count?empty('还没有找到相关内容','试试更简短的关键词，或浏览所有学习方向。'):''}`;
 }
 function render() {
-  const views={interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
+  const views={projects:projectLab.page,interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
   disposeHomeMotion();
   disposeFluidMotion();
   nav();document.body.dataset.page=route();content.innerHTML=(views[route()] || home)();document.title=`${titles[route()] || titles.home} · 知序`;
@@ -128,7 +131,7 @@ function curriculumMarkup(p) {
 function showPath(id,keepFocus=false) {
   const p=itemById(id);if(!p)return;
   const progress=progressFor(p,state), joined=state.joined.includes(id), related=resources.filter(r=>r.paths.includes(id));
-  const markup=dialogHeader(p.en || 'POSTGRADUATE STUDY',p.title,p.desc)+`<div class="dialog-body"><div class="dialog-lead"><span id="dialog-progress">${progress.count}/${progress.total} 个阶段已完成 · ${progress.percent}%</span><button class="btn ${joined?'btn-secondary':'btn-primary'}" data-join="${id}">${icon(joined?'check':'calendar')}${joined?'已加入我的学习':'加入我的学习'}</button></div><ol class="stage-list">${p.stages.map(([title,desc],i)=>`<li class="stage-item ${(state.done[id]||[]).includes(i)?'completed':''}"><input class="stage-check" type="checkbox" id="stage-${i}" data-stage="${i}" data-item="${id}" ${(state.done[id]||[]).includes(i)?'checked':''}><label for="stage-${i}">${title}</label><p>${desc}</p></li>`).join('')}</ol>${curriculumMarkup(p)}${related.length?`<h3 class="dialog-subtitle">搭配这些资料开始学习</h3><div class="resource-list dialog-resources">${related.map(r=>resourceRow(r,true)).join('')}</div>`:''}${!p.id.startsWith('exam-')?career.preview(p.id):''}<div class="notice">${icon('info')}<span>${p.id.startsWith('exam-')?'提纲用于组织复习，实际范围请核对目标专业当年考试要求。':'阶段顺序是一份起点，可以根据已有基础调整学习节奏。'} 勾选阶段会自动加入学习，记录保存在当前浏览器。</span></div></div>`;
+  const markup=dialogHeader(p.en || 'POSTGRADUATE STUDY',p.title,p.desc)+`<div class="dialog-body"><div class="dialog-lead"><span id="dialog-progress">${progress.count}/${progress.total} 个阶段已完成 · ${progress.percent}%</span><button class="btn ${joined?'btn-secondary':'btn-primary'}" data-join="${id}">${icon(joined?'check':'calendar')}${joined?'已加入我的学习':'加入我的学习'}</button></div><ol class="stage-list">${p.stages.map(([title,desc],i)=>`<li class="stage-item ${(state.done[id]||[]).includes(i)?'completed':''}"><input class="stage-check" type="checkbox" id="stage-${i}" data-stage="${i}" data-item="${id}" ${(state.done[id]||[]).includes(i)?'checked':''}><label for="stage-${i}">${title}</label><p>${desc}</p></li>`).join('')}</ol>${curriculumMarkup(p)}${related.length?`<h3 class="dialog-subtitle">搭配这些资料开始学习</h3><div class="resource-list dialog-resources">${related.map(r=>resourceRow(r,true)).join('')}</div>`:''}${!p.id.startsWith('exam-')?projectLab.preview(p.id)+career.preview(p.id):''}<div class="notice">${icon('info')}<span>${p.id.startsWith('exam-')?'提纲用于组织复习，实际范围请核对目标专业当年考试要求。':'阶段顺序是一份起点，可以根据已有基础调整学习节奏。'} 勾选阶段会自动加入学习，记录保存在当前浏览器。</span></div></div>`;
   if(keepFocus){document.getElementById('dialog-content').innerHTML=markup;dialog.querySelector('[data-join]')?.focus({preventScroll:true});return;}showDialog(markup);
 }
 function showGuide() {
@@ -250,7 +253,7 @@ function createFluidSystem() {
   let cursor = {x:.7,y:.35}, targetCursor = {...cursor};
   let revealObserver, modalObserver, surfaceSet = new Set();
   const animations = new Set(), droplets = new Set();
-  const surfaceSelector = '.path-card,.resource-row,.support-card,.subject-card,.panel,.planner,.exam-banner,.notice,.draft-item,.roadmap-step,.company-card,.question-card,.strategy-card,.curated-experience,.experience-empty,.review-notebook,.role-overview,.company-focus,.prep-flow,.career-bridge,.overview-stats,.empty-state,.support-status,.search-question,.dashboard-stat,.stat-item,.study-item,.guide-option,.stage-item,.plan-phase,.theory-card,.practice-card,.project-brief,.pitfall-note';
+  const surfaceSelector = '.project-card,.path-card,.resource-row,.support-card,.subject-card,.panel,.planner,.exam-banner,.notice,.draft-item,.roadmap-step,.company-card,.question-card,.strategy-card,.curated-experience,.experience-empty,.review-notebook,.role-overview,.company-focus,.prep-flow,.career-bridge,.overview-stats,.empty-state,.support-status,.search-question,.dashboard-stat,.stat-item,.study-item,.guide-option,.stage-item,.plan-phase,.theory-card,.practice-card,.project-brief,.pitfall-note';
   let routeKey = '', activeSurfaceRect;
   function colors() {
     const style = getComputedStyle(root);

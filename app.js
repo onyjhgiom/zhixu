@@ -51,7 +51,7 @@ const dialog = document.getElementById('detail-dialog');
 const content = document.getElementById('content');
 const career=createCareer({paths,resources,resourceRow,icon,e,toast,go,closeDialog,exportFile});
 const projectLab=createProjects({paths,icon,e,closeDialog});
-const titles = {projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
+const titles = {workspace:'我的学习空间',projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
 function route() { return location.hash.slice(1).split('?')[0] || 'home'; }
 function query() { return new URLSearchParams(location.hash.split('?')[1] || '').get('q') || ''; }
 function toast(text) { const el=document.getElementById('toast'); el.textContent=text;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3000); }
@@ -59,9 +59,13 @@ function persist() { try { localStorage.setItem(storageKey,JSON.stringify(state)
 function go(page) { if(location.hash === `#${page}`) render();else location.hash=page; }
 function nav() {
   const primary=[['home','grid','学习概览'],['tech','code','技术成长'],['roadmaps','branch','学习路线'],['resources','book','资料库'],['projects','code','项目实践'],['interviews','users','求职面试'],['exam','cap','考研升学'],['support','users','考研帮扶']];
-  const personal=[['learning','calendar','我的学习'],['saved','bookmark','我的收藏']];
+  const personal=[['workspace','grid','空间主页'],['learning','calendar','我的学习'],['saved','bookmark','我的收藏']];
   const link=([id,i,title])=>`<a href="#${id}" class="nav-item ${route()===id?'active':''}" ${route()===id?'aria-current="page"':''}>${icon(i)}<span>${title}</span>${id==='saved'&&state.saved.length?`<span class="nav-count">${state.saved.length}</span>`:''}</a>`;
   document.getElementById('main-nav').innerHTML=primary.map(link).join('');document.getElementById('personal-nav').innerHTML=personal.map(link).join('');document.getElementById('page-title').textContent=titles[route()] || titles.home;
+  const profile=document.querySelector('.local-profile');
+  profile.classList.toggle('active',route()==='workspace');
+  if(route()==='workspace')profile.setAttribute('aria-current','page');else profile.removeAttribute('aria-current');
+  profile.querySelector('.status-dot').title=storageAvailable?'记录保存在当前浏览器':'本次会话记录，浏览器暂时无法保存';
 }
 function tabs() { return `<div class="category-tabs" role="group" aria-label="筛选技术方向">${categories.map(c=>`<button class="tab ${c.id===activeCategory?'active':''}" data-category="${c.id}" aria-pressed="${c.id===activeCategory}">${c.name}</button>`).join('')}</div>`; }
 function card(item, learning=false) {
@@ -84,7 +88,7 @@ function home() {
 }
 function technology(roadmap=false) {
   const list=paths.filter(p=>activeCategory==='all'||p.category===activeCategory);
-  return `<div class="page-header"><div><div class="eyebrow">${roadmap?'LEARNING ROADMAPS':'EXPLORE YOUR DIRECTION'}</div><h1>${roadmap?'把目标，变成可走的路线。':'找到你想深入的方向。'}</h1><p>${roadmap?'每条路线都从基础开始，通过阶段任务走向实战。完成一个阶段，就为自己留下一个进步的标记。':'覆盖人工智能、研发工程、计算机基础与产品协作。从你感兴趣的方向开始，逐步建立知识与实践能力。'}</p></div></div>${roadmap?`<div class="roadmap-intro"><div class="roadmap-step"><b>01</b><strong>选择一个方向</strong><p>结合已有基础与当前目标，先选一条路线。</p></div><div class="roadmap-step"><b>02</b><strong>完成阶段任务</strong><p>阅读资料、动手练习，留下可检查的成果。</p></div><div class="roadmap-step"><b>03</b><strong>记录与复盘</strong><p>标记阶段进度，再决定下一步深入哪里。</p></div></div>`:''}<div class="page-tools">${tabs()}<span class="result-count">${list.length} 条路线 · ${list.reduce((n,p)=>n+p.stages.length,0)} 个学习阶段</span></div><div class="path-grid">${list.map(p=>card(p)).join('')}</div>`;
+  return `<div class="page-header"><div><div class="eyebrow">${roadmap?'LEARNING ROADMAPS':'EXPLORE YOUR DIRECTION'}</div><h1>${roadmap?'把目标，变成可走的路线。':'找到你想深入的方向。'}</h1><p>${roadmap?'每条路线都从基础开始，通过阶段任务走向实战。完成一个阶段，就为自己留下一个进步的标记。':'覆盖人工智能、研发工程、系统与安全、移动与交互、计算机基础与产品协作。从感兴趣的方向开始，逐步建立知识与实践能力。'}</p></div></div>${roadmap?`<div class="roadmap-intro"><div class="roadmap-step"><b>01</b><strong>选择一个方向</strong><p>结合已有基础与当前目标，先选一条路线。</p></div><div class="roadmap-step"><b>02</b><strong>完成阶段任务</strong><p>阅读资料、动手练习，留下可检查的成果。</p></div><div class="roadmap-step"><b>03</b><strong>记录与复盘</strong><p>标记阶段进度，再决定下一步深入哪里。</p></div></div>`:''}<div class="page-tools">${tabs()}<span class="result-count">${list.length} 条路线 · ${list.reduce((n,p)=>n+p.stages.length,0)} 个学习阶段</span></div><div class="path-grid">${list.map(p=>card(p)).join('')}</div>`;
 }
 function resourcePage(savedOnly=false) {
   const list=resources.filter(r=>(!savedOnly||state.saved.includes(r.id))&&(resourcePath==='all'||r.paths.includes(resourcePath))&&(resourceLanguage==='all'||r.lang===resourceLanguage)&&(resourceLevel==='all'||r.level===resourceLevel));
@@ -101,6 +105,46 @@ function examPage() {
 function supportPage() {
   return `<div class="page-header"><div><div class="eyebrow">SUPPORT ALONG THE WAY</div><h1>遇到卡点，让问题更清楚一点。</h1><p>把当前基础、目标和具体问题整理成一份需求草稿，为之后的导师沟通做好准备。</p></div></div><div class="notice">${icon('info')}<span>帮扶服务为产品流程演示，目前没有接入真实导师、排期或支付。填写的需求只保存在当前浏览器，不会发送给任何人。</span></div><div class="support-grid">${helpServices.map(s=>`<article class="support-card"><span class="tile-icon tone-green">${icon(s.icon)}</span><h3>${s.title}</h3><p>${s.desc}</p><small>${s.output}</small><button class="btn btn-secondary" data-help="${s.id}">整理我的需求 ${icon('arrow')}</button></article>`).join('')}</div><div class="roadmap-intro section-divider"><div class="roadmap-step"><b>01</b><strong>明确问题</strong><p>写出目标、基础和已经尝试过的方法。</p></div><div class="roadmap-step"><b>02</b><strong>保存需求草稿</strong><p>在当前浏览器留存，也可以导出自行备份。</p></div><div class="roadmap-step"><b>03</b><strong>后续接入导师</strong><p>正式服务需配置导师审核、排期和反馈流程。</p></div></div><section class="support-status"><h3>我的帮扶需求草稿</h3>${state.drafts.length?state.drafts.map((d,i)=>`<article class="draft-item"><div><strong>${helpServices.find(s=>s.id===d.service)?.title} · ${e(d.goal || '暂未填写目标')}</strong><p>${e(d.text)}</p></div><div><span class="draft-badge">仅本地草稿</span><button class="icon-button" data-delete-draft="${i}" aria-label="删除第 ${i+1} 份需求草稿">${icon('close')}</button></div></article>`).join(''):`<p class="privacy-line">还没有草稿。选择一个方向，把最想解决的问题写下来。</p>`}${state.drafts.length?`<button class="export-link" data-action="export-drafts">${icon('download')} 导出需求草稿</button>`:''}</section>`;
 }
+function workspacePage() {
+  const joined=state.joined.map(itemById).filter(Boolean);
+  const stages=joined.reduce((sum,item)=>sum+progressFor(item,state).count,0);
+  const total=joined.reduce((sum,item)=>sum+item.stages.length,0);
+  const completed=joined.filter(item=>progressFor(item,state).percent===100).length;
+  const next=joined.find(item=>progressFor(item,state).percent<100);
+  const nextIndex=next?.stages.findIndex((_,i)=>!(state.done[next.id]||[]).includes(i));
+  const saved=state.saved.map(id=>resources.find(r=>r.id===id)).filter(Boolean).reverse();
+  const metric=(href,value,label,action='')=>`<a class="workspace-metric" href="#${href}" ${action?`data-action="${action}"`:''}><span class="workspace-metric-label">${label}${icon('arrow')}</span><strong>${value}</strong><small>查看详情</small></a>`;
+  return `<div class="workspace-page">
+    <header class="workspace-hero">
+      <div><div class="eyebrow">MY LEARNING / WORKSPACE</div><h1>我的学习空间</h1><p>接着上一次的进度，把学习路线、知识收藏与备考计划，变成今天可以完成的一步。</p><div class="workspace-status">${icon(storageAvailable?'check':'info')}<span>${storageAvailable?'学习记录已在当前浏览器保存':'浏览器暂时无法保存，记录仅在本次会话中有效'}</span></div></div>
+      <div class="workspace-orbit" aria-hidden="true"><span>${icon('terminal')}</span><small>LEARN · BUILD · GROW</small></div>
+    </header>
+    <div class="workspace-metrics" aria-label="我的学习统计">
+      ${metric('learning',joined.length,'已加入路线')}${metric('learning',stages,'已完成阶段')}${metric('saved',saved.length,'已收藏资料','saved')}${metric('learning',completed,'已完成路线')}
+    </div>
+    <section class="workspace-next panel" aria-labelledby="workspace-next-title">
+      <div><div class="eyebrow">YOUR NEXT STEP</div><h2 id="workspace-next-title">${next?'继续未完成的学习':joined.length?'已完成所有已加入路线':'从第一条学习路线开始'}</h2>${next?`<h3>${e(next.title)} <span>第 ${nextIndex+1} / ${next.stages.length} 阶段</span></h3><p>${e(next.stages[nextIndex][0])}：${e(next.stages[nextIndex][1])}</p>`:`<p>${joined.length?'每一次完成都值得肯定。回顾已有成果，或选择一个新方向继续探索。':'选择感兴趣的方向，加入学习并勾选完成的阶段，这里就会显示你的真实进度。'}</p>`}</div>
+      ${next?`<button class="btn btn-primary" data-path="${next.id}">继续学习 ${icon('arrow')}</button>`:`<a class="btn btn-primary" href="#tech">探索学习方向 ${icon('arrow')}</a>`}
+    </section>
+    <div class="workspace-columns">
+      <section class="workspace-section panel" aria-labelledby="workspace-routes-title">
+        <div class="workspace-section-head"><h2 id="workspace-routes-title">学习中的路线</h2><a href="#learning">查看全部 ${icon('arrow')}</a></div>
+        ${joined.length?`<p class="workspace-summary">已完成 ${stages} / ${total} 个阶段，${completed} 条路线已走完。</p><div class="workspace-route-list">${joined.slice(0,4).map(item=>{const progress=progressFor(item,state);return `<button class="workspace-route" data-path="${item.id}"><span class="tile-icon tone-${item.tone}">${icon(item.icon)}</span><span class="workspace-route-body"><strong>${e(item.title)}</strong><span class="progress-label"><span>${progress.count} / ${progress.total} 阶段</span><span>${progress.percent}%</span></span><span class="small-progress"><span style="width:${progress.percent}%"></span></span></span>${icon('chevron')}</button>`;}).join('')}</div>`:`<div class="workspace-empty">${icon('branch')}<h3>还没有加入路线</h3><p>技术方向与考研专题都可以加入学习，进度会同步显示在这里。</p><a class="btn btn-secondary" href="#tech">选择学习路线 ${icon('arrow')}</a></div>`}
+      </section>
+      <section class="workspace-section panel" aria-labelledby="workspace-plans-title">
+        <div class="workspace-section-head"><h2 id="workspace-plans-title">我的备考与帮扶</h2>${icon('cap')}</div>
+        <div class="workspace-plan"><span class="subtle-badge">${state.plan?'已生成草案':'待制定'}</span><h3>考研复习计划</h3><p>${state.plan?`${state.plan.weeks} 周 · 每天 ${state.plan.hours} 小时 · ${state.plan.subject==='408'?'408 专业课':'院校自命题专业课'}`:'按备考周数和每天可用时间，生成适合自己的复习草案。'}</p><div class="workspace-actions"><a class="btn btn-secondary" href="#exam">${state.plan?'查看 / 调整计划':'制定复习计划'} ${icon('arrow')}</a>${state.plan?`<button class="export-link" data-action="export-plan">${icon('download')}导出计划</button>`:''}</div></div>
+        <div class="workspace-drafts"><h3>帮扶需求草稿 <span>${state.drafts.length} 份</span></h3><p>${state.drafts.length?'已保存需求草稿，可继续查看、整理或导出。草稿尚未发送给导师。':'整理择校、复习或答疑问题，为后续沟通做准备。'}</p><a href="#support" class="workspace-text-link">${state.drafts.length?'查看我的草稿':'整理帮扶需求'} ${icon('arrow')}</a></div>
+      </section>
+    </div>
+    <section class="workspace-section panel workspace-saved" aria-labelledby="workspace-saved-title">
+      <div class="workspace-section-head"><h2 id="workspace-saved-title">我的知识收藏</h2><a href="#saved" data-action="saved">查看全部 ${saved.length} 份 ${icon('arrow')}</a></div>
+      ${saved.length?`<p class="workspace-summary">最近加入收藏的资料，点击即可在新标签页继续阅读。</p><div class="resource-list">${saved.slice(0,3).map(r=>resourceRow(r,true)).join('')}</div>`:`<div class="workspace-empty">${icon('bookmark')}<h3>把好资料留在手边</h3><p>在资料库点击收藏按钮，就能在这里快速找到。</p><a class="btn btn-secondary" href="#resources">浏览学习资料 ${icon('arrow')}</a></div>`}
+    </section>
+    <section class="workspace-section" aria-labelledby="workspace-tools-title"><div class="workspace-section-head"><h2 id="workspace-tools-title">实践与求职</h2><span class="workspace-summary">让输入变成输出</span></div><div class="workspace-tools"><a class="panel workspace-tool" href="#projects"><span class="tile-icon tone-green">${icon('code')}</span><div><h3>项目实践</h3><p>按岗位和地区寻找开源项目，开始动手实践。</p></div>${icon('arrow')}</a><a class="panel workspace-tool" href="#interviews"><span class="tile-icon tone-purple">${icon('users')}</span><div><h3>笔试与面试</h3><p>进入岗位题库、公司专题与面试复盘。</p></div>${icon('arrow')}</a></div></section>
+    <div class="workspace-backup notice">${icon('info')}<p>学习进度、收藏、复习计划与帮扶草稿${storageAvailable?'保存在当前浏览器':'当前仅保留在本次会话'}，暂不支持跨设备同步。可以导出一份学习记录留作备份。</p><button class="btn btn-secondary" data-action="export-learning">${icon('download')}导出学习记录</button></div>
+  </div>`;
+}
 function learningPage() {
   const joined=state.joined.map(itemById).filter(Boolean), completed=joined.filter(p=>progressFor(p,state).percent===100).length, stages=joined.reduce((n,p)=>n+progressFor(p,state).count,0);
   return `<div class="page-header"><div><div class="eyebrow">SMALL STEPS, REAL PROGRESS</div><h1>每一个完成，都留下痕迹。</h1><p>不必着急走得很快，持续完成阶段任务，让知识真正成为自己的能力。</p></div></div><div class="dashboard-grid"><div class="dashboard-stat"><b>${joined.length}</b><span>已加入学习的路线</span></div><div class="dashboard-stat"><b>${stages}</b><span>已完成的学习阶段</span></div><div class="dashboard-stat"><b>${completed}</b><span>已走完的完整路线</span></div></div>${joined.length?`<div class="path-grid">${joined.map(p=>card(p,true)).join('')}</div>`:empty('你的第一条路线，正等着开始','打开一条感兴趣的路线，点击「加入我的学习」，就可以记录阶段进度。')}<div class="notice">${icon('info')}<span>学习进度与收藏${storageAvailable?'保存在当前浏览器':'暂时只能保留在本次页面会话'}，暂不支持跨设备同步。暂停路线会保留阶段进度，下次加入时可以继续。</span></div>`;
@@ -112,7 +156,7 @@ function searchPage() {
   return `<div class="page-header"><div><h1>搜索 <span class="query-label">“${e(q)}”</span></h1><p>找到 ${foundPaths.length} 条技术路线、${foundResources.length} 份资料、${foundExam.length} 个考研专题、${foundProjects.count} 个实践项目与 ${foundCareer.count} 项求职内容。</p></div><button class="btn btn-secondary" data-action="clear-search">清除搜索 ${icon('close')}</button></div>${foundPaths.length?`<h2 class="search-heading">技术学习路线</h2><div class="path-grid">${foundPaths.map(p=>card(p)).join('')}</div>`:''}${foundResources.length?`<h2 class="search-heading">学习资料</h2><div class="resource-list">${foundResources.map(r=>resourceRow(r,true)).join('')}</div>`:''}${foundExam.length?`<h2 class="search-heading">考研知识梳理</h2><div class="path-grid">${foundExam.map(p=>card(p)).join('')}</div>`:''}${foundProjects.markup}${foundCareer.markup}${!foundPaths.length&&!foundResources.length&&!foundExam.length&&!foundCareer.count&&!foundProjects.count?empty('还没有找到相关内容','试试更简短的关键词，或浏览所有学习方向。'):''}`;
 }
 function render() {
-  const views={projects:projectLab.page,interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
+  const views={workspace:workspacePage,projects:projectLab.page,interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
   disposeHomeMotion();
   disposeFluidMotion();
   nav();document.body.dataset.page=route();content.innerHTML=(views[route()] || home)();document.title=`${titles[route()] || titles.home} · 知序`;
@@ -147,6 +191,7 @@ function exportFile(name,text,type='text/plain;charset=utf-8') {
 function setSidebar(open) {document.getElementById('sidebar').classList.toggle('open',open);document.getElementById('sidebar-overlay').hidden=!open;document.getElementById('mobile-menu').setAttribute('aria-expanded',String(open));}
 document.addEventListener('click',event=>{
   const target=event.target.closest('button,a');if(!target)return;
+  if(target.closest('.sidebar') && target.getAttribute('href')?.startsWith('#'))setSidebar(false);
   if(target.dataset.resourceLanguage){resourceLanguage=target.dataset.resourceLanguage;render();document.querySelector('[data-resource-language]')?.focus();return;}
   if(target.dataset.resources){resourcePath=target.dataset.resources;resourceLanguage='all';resourceLevel='all';if(dialog.open)closeDialog();go('resources');return;}
   if(target.dataset.path){showPath(target.dataset.path);return;}
@@ -166,6 +211,7 @@ document.addEventListener('click',event=>{
     case 'saved':resourcePath='all';resourceLanguage='all';resourceLevel='all';go('saved');break;
     case 'close-dialog':closeDialog();break;
     case 'clear-search':document.getElementById('search-input').value='';go('resources');break;
+    case 'export-learning':exportFile('知序-学习记录.json',JSON.stringify({version:1,exportedAt:new Date().toISOString(),learning:state},null,2),'application/json');toast('学习记录已导出');break;
     case 'export-drafts':exportFile('知序-帮扶需求草稿.json',JSON.stringify(state.drafts,null,2),'application/json');toast('需求草稿已导出');break;
     case 'export-plan':if(state.plan){const p=buildExamPlan(state.plan);exportFile('知序-复习计划.txt',`知序 · ${p.weeks} 周复习草案\n每天可用时间：${p.hours} 小时\n专业课：${p.subject==='408'?'408':'自命题'}\n\n${p.phases.map(x=>`${x.name}：${x.weeks} 周\n${x.focus}`).join('\n\n')}\n\n每日参考分配\n${p.daily.map(x=>`${x.name}：${x.hours} 小时`).join('\n')}\n\n这是按固定比例生成的初始草案，请根据实际考试科目和个人基础调整；不考数学时请重新分配时间。\n考试要求以当年院校官方信息为准。`);toast('复习草案已导出');}break;
   }
@@ -253,7 +299,7 @@ function createFluidSystem() {
   let cursor = {x:.7,y:.35}, targetCursor = {...cursor};
   let revealObserver, modalObserver, surfaceSet = new Set();
   const animations = new Set(), droplets = new Set();
-  const surfaceSelector = '.project-card,.path-card,.resource-row,.support-card,.subject-card,.panel,.planner,.exam-banner,.notice,.draft-item,.roadmap-step,.company-card,.question-card,.strategy-card,.curated-experience,.experience-empty,.review-notebook,.role-overview,.company-focus,.prep-flow,.career-bridge,.overview-stats,.empty-state,.support-status,.search-question,.dashboard-stat,.stat-item,.study-item,.guide-option,.stage-item,.plan-phase,.theory-card,.practice-card,.project-brief,.pitfall-note';
+  const surfaceSelector = '.workspace-hero,.workspace-metric,.project-card,.path-card,.resource-row,.support-card,.subject-card,.panel,.planner,.exam-banner,.notice,.draft-item,.roadmap-step,.company-card,.question-card,.strategy-card,.curated-experience,.experience-empty,.review-notebook,.role-overview,.company-focus,.prep-flow,.career-bridge,.overview-stats,.empty-state,.support-status,.search-question,.dashboard-stat,.stat-item,.study-item,.guide-option,.stage-item,.plan-phase,.theory-card,.practice-card,.project-brief,.pitfall-note';
   let routeKey = '', activeSurfaceRect;
   function colors() {
     const style = getComputedStyle(root);

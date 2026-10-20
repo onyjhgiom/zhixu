@@ -5,7 +5,7 @@ export function createProjects({ paths, icon, e, closeDialog }) {
   const selection = () => parseProjectFilters(location.hash, paths);
   const filtered = s => filterProjects(projects, s, paths);
   const options = (items, current) => items.map(x => '<option value="' + e(x.id) + '"' + (current === x.id ? ' selected' : '') + '>' + e(x.name || x.title) + '</option>').join('');
-  const quickRoles = ['all', 'agent', 'frontend', 'backend', 'posttrain', 'cloud'];
+  const quickRoles = ['all', 'agent', 'nlp', 'recsys', 'frontend', 'backend', 'mobile', 'game', 'graphics', 'mlops'];
 
   function card(p, hidden = false) {
     const roles = p.roles.map(id => roleById.get(id));

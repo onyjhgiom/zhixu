@@ -117,3 +117,89 @@
 | Spring Cloud Alibaba · 微服务协作实验 | https://github.com/alibaba/spring-cloud-alibaba | 中国 · 杭州（发起机构所在地） |
 
 机构地区来源：Tencent（Shenzhen, China）：https://github.com/Tencent；Alibaba（Hangzhou, China）：https://github.com/alibaba；Microsoft（Redmond, WA）：https://github.com/microsoft；MIT PDOS（Cambridge, MA）：https://github.com/mit-pdos。地点取自公开组织档案，未从项目语言、名称或维护者姓名推测所在地。其余条目统一标为全球协作。
+
+
+## 方向、资料与项目扩充（2026-10-19）
+
+新增十个岗位方向的课程、任务和面试题为本站编写。20 个新增项目在 GitHub 公开仓库 API 均返回 HTTP 200，核对了仓库简介和归档状态；Solidity 使用返回的规范地址 argotorg/solidity。这里只核对仓库与资料入口，未逐一安装运行所有外部项目。
+
+| 方向 | 项目 | 仓库 |
+| --- | --- | --- |
+| 自然语言处理 | Transformers · 中文文本分类实验 | https://github.com/huggingface/transformers |
+| 自然语言处理 | HanLP · 中文信息抽取流水线 | https://github.com/hankcs/HanLP |
+| 推荐与搜索 | RecBole · 推荐召回与排序评测 | https://github.com/RUCAIBox/RecBole |
+| 推荐与搜索 | Gorse · 推荐服务与冷启动 | https://github.com/gorse-io/gorse |
+| 移动应用开发 | Flutter Samples · 跨端应用实践 | https://github.com/flutter/samples |
+| 移动应用开发 | Now in Android · 原生应用架构 | https://github.com/android/nowinandroid |
+| 游戏开发 | Godot Demos · 2D 游戏玩法实验 | https://github.com/godotengine/godot-demo-projects |
+| 游戏开发 | Cocos Engine · 组件与场景机制 | https://github.com/cocos/cocos-engine |
+| 计算机图形学与 XR | Three.js · 交互式三维展厅 | https://github.com/mrdoob/three.js |
+| 计算机图形学与 XR | LearnOpenGL · 渲染管线小实验 | https://github.com/JoeyDeVries/LearnOpenGL |
+| AI Infra 与 MLOps | MLflow · 模型实验与版本追踪 | https://github.com/mlflow/mlflow |
+| AI Infra 与 MLOps | vLLM · 模型推理服务性能实验 | https://github.com/vllm-project/vllm |
+| 网络工程 | Mininet · 可复现网络拓扑 | https://github.com/mininet/mininet |
+| 网络工程 | FRRouting · 动态路由实验 | https://github.com/FRRouting/frr |
+| 机器人与自动驾驶 | ROS 2 Examples · 消息与节点实验 | https://github.com/ros2/examples |
+| 机器人与自动驾驶 | Webots · 移动机器人导航仿真 | https://github.com/cyberbotics/webots |
+| 编译器与语言工具链 | LLVM · 小语言与中间表示 | https://github.com/llvm/llvm-project |
+| 编译器与语言工具链 | Crafting Interpreters · 自制解释器 | https://github.com/munificent/craftinginterpreters |
+| 区块链工程 | Solidity · 本地合约与状态验证 | https://github.com/argotorg/solidity |
+| 区块链工程 | Fabric Samples · 联盟链流程实验 | https://github.com/hyperledger/fabric-samples |
+
+中文入口保留作者和译者信息，英文 vLLM 官方文档独立标为英文。NLP-Beginner 原仓库已迁移至 nndl/llm-beginner，按实际内容更名。旧 Three.js 中文直链和错误的 vLLM 中文路径没有继续使用；Gorse 改用当前站点导航中的中文文档路径，Docker 失效章节以 Python 官方网络服务文档替换。
+
+部分外部请求因连接失败、超时或 GitHub API 配额限制未完成核验，不能据此判定页面不存在，也不宣称全部新增资料均已核验可访问。下表仅将直接页面 HTTP 200 或已取得中文 README 的条目标记为已检查，其余仍需后续人工复核。单页应用的 HTTP 200 只代表入口可达。
+
+| 方向 | 资料 | 语言 | 核验结果 |
+| --- | --- | --- | --- |
+| 自然语言处理 | [Hugging Face 中文 NLP 课程](https://huggingface.co/learn/nlp-course/zh-CN/chapter1/1) | 中文 | 待人工复核：网络或配额限制 |
+| 自然语言处理 | [Transformers 中文文档](https://huggingface.co/docs/transformers/zh/index) | 中文 | 待人工复核：网络或配额限制 |
+| 自然语言处理 | [jieba 中文分词](https://github.com/fxsjy/jieba) | 中文 | 中文 README 已核对 |
+| 自然语言处理 | [HanLP 中文处理文档](https://github.com/hankcs/HanLP) | 中文 | 中文 README 已核对 |
+| 自然语言处理 | [大模型与智能体中文编程任务](https://github.com/nndl/llm-beginner) | 中文 | 中文 README 已核对 |
+| 推荐与搜索 | [Fun-Rec 中文推荐系统教程](https://github.com/datawhalechina/fun-rec) | 中文 | 中文 README 已核对 |
+| 推荐与搜索 | [Gorse 中文冷启动与非个性化推荐](https://gorse.io/zh/docs/concepts/recommenders/non-personalized.html) | 中文 | 待人工复核：网络或配额限制 |
+| 推荐与搜索 | [PaddleRec 推荐模型实践](https://github.com/PaddlePaddle/PaddleRec) | 中文 | 中文 README 已核对 |
+| 推荐与搜索 | [Gorse 中文文档](https://gorse.io/zh/docs/) | 中文 | 待人工复核：网络或配额限制 |
+| 推荐与搜索 | [AI 推荐系统中文学习笔记](https://github.com/zhongqiangwu960812/AI-RecommenderSystem) | 中文 | 中文 README 已核对 |
+| 移动应用开发 | [Flutter 中文文档](https://docs.flutter.cn/) | 中文 | 待人工复核：网络或配额限制 |
+| 移动应用开发 | [Android 中文学习课程](https://developer.android.google.cn/courses?hl=zh-cn) | 中文 | 待人工复核：网络或配额限制 |
+| 移动应用开发 | [Jetpack Compose 中文文档](https://developer.android.google.cn/jetpack/compose/documentation?hl=zh-cn) | 中文 | 待人工复核：网络或配额限制 |
+| 移动应用开发 | [React Native 中文文档](https://reactnative.cn/docs/getting-started) | 中文 | 待人工复核：网络或配额限制 |
+| 移动应用开发 | [HarmonyOS ArkTS 入门](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/arkts-get-started) | 中文 | 待人工复核：网络或配额限制 |
+| 游戏开发 | [Godot 中文首个 2D 游戏](https://docs.godotengine.org/zh-cn/stable/getting_started/first_2d_game/index.html) | 中文 | 待人工复核：网络或配额限制 |
+| 游戏开发 | [Godot 中文物理文档](https://docs.godotengine.org/zh-cn/stable/tutorials/physics/index.html) | 中文 | 页面 HTTP 200 |
+| 游戏开发 | [Godot 中文多人网络文档](https://docs.godotengine.org/zh-cn/stable/tutorials/networking/high_level_multiplayer.html) | 中文 | 页面 HTTP 200 |
+| 游戏开发 | [Cocos Creator 中文手册](https://docs.cocos.com/creator/manual/zh/) | 中文 | 页面 HTTP 200 |
+| 游戏开发 | [Cocos 中文脚本指南](https://docs.cocos.com/creator/manual/zh/scripting/) | 中文 | 页面 HTTP 200 |
+| 计算机图形学与 XR | [WebGL 中文基础与渲染管线](https://webglfundamentals.org/webgl/lessons/zh_cn/webgl-fundamentals.html) | 中文 | 待人工复核：网络或配额限制 |
+| 计算机图形学与 XR | [WebGL 中文三维透视](https://webglfundamentals.org/webgl/lessons/zh_cn/webgl-3d-perspective.html) | 中文 | 待人工复核：网络或配额限制 |
+| 计算机图形学与 XR | [WebGL 中文方向光照](https://webglfundamentals.org/webgl/lessons/zh_cn/webgl-3d-lighting-directional.html) | 中文 | 待人工复核：网络或配额限制 |
+| 计算机图形学与 XR | [LearnOpenGL 中文教程](https://learnopengl-cn.github.io/) | 中文 | 页面 HTTP 200 |
+| 计算机图形学与 XR | [GAMES101 中文图形学课程](https://games-cn.org/intro-graphics/) | 中文 | 页面 HTTP 200 |
+| AI Infra 与 MLOps | [Self-LLM 中文模型部署实战](https://github.com/datawhalechina/self-llm) | 中文 | 待人工复核：网络或配额限制 |
+| AI Infra 与 MLOps | [Kubernetes 中文 GPU 调度](https://kubernetes.io/zh-cn/docs/tasks/manage-gpus/scheduling-gpus/) | 中文 | 页面 HTTP 200 |
+| AI Infra 与 MLOps | [动手学深度学习：计算性能](https://zh.d2l.ai/chapter_computational-performance/index.html) | 中文 | 页面 HTTP 200 |
+| AI Infra 与 MLOps | [PaddlePaddle 中文框架指南](https://www.paddlepaddle.org.cn/documentation/docs/zh/guides/index_cn.html) | 中文 | 页面 HTTP 200 |
+| AI Infra 与 MLOps | [InternLM 中文实战教程](https://github.com/InternLM/Tutorial) | 中文 | 中文 README 已核对 |
+| 网络工程 | [小林 coding：图解网络](https://www.xiaolincoding.com/network/) | 中文 | 页面 HTTP 200 |
+| 网络工程 | [网络与系统中文实践笔记](https://github.com/yanfeizhang/coder-kung-fu) | 中文 | 待人工复核：网络或配额限制 |
+| 网络工程 | [协议与网络中文专题](https://github.com/halfrost/Halfrost-Field/tree/master/contents/Protocol) | 中文 | 待人工复核：网络或配额限制 |
+| 网络工程 | [Python socket 中文文档](https://docs.python.org/zh-cn/3/library/socket.html) | 中文 | 页面 HTTP 200 |
+| 网络工程 | [Python socketserver 中文网络服务](https://docs.python.org/zh-cn/3/library/socketserver.html) | 中文 | 待人工复核：网络或配额限制 |
+| 机器人与自动驾驶 | [动手学 ROS 2 中文教程](https://fishros.com/d2lros2/) | 中文 | 页面 HTTP 200 |
+| 机器人与自动驾驶 | [视觉 SLAM 十四讲第二版代码](https://github.com/gaoxiang12/slambook2) | 中文 | 待人工复核：网络或配额限制 |
+| 机器人与自动驾驶 | [SLAM 中文学习与总结](https://github.com/HeYijia/SLAMSummarization) | 中文 | 待人工复核：网络或配额限制 |
+| 机器人与自动驾驶 | [ROS 运动规划实践](https://github.com/ai-winter/ros_motion_planning) | 中文 | 待人工复核：网络或配额限制 |
+| 机器人与自动驾驶 | [Easy RL 中文强化学习教程](https://github.com/datawhalechina/easy-rl) | 中文 | 待人工复核：网络或配额限制 |
+| 编译器与语言工具链 | [LLVM 中文入门教程](https://llvm-tutorial-cn.readthedocs.io/en/latest/) | 中文 | 页面 HTTP 200 |
+| 编译器与语言工具链 | [北京大学 MiniC 在线实验文档](https://pku-minic.github.io/online-doc/#/) | 中文 | 页面 HTTP 200 |
+| 编译器与语言工具链 | [MiniDecaf 中文编译实验教程](https://github.com/decaf-lang/minidecaf-tutorial) | 中文 | 待人工复核：网络或配额限制 |
+| 编译器与语言工具链 | [Python AST 中文接口文档](https://docs.python.org/zh-cn/3/library/ast.html) | 中文 | 待人工复核：网络或配额限制 |
+| 编译器与语言工具链 | [Python 字节码分析中文文档](https://docs.python.org/zh-cn/3/library/dis.html) | 中文 | 待人工复核：网络或配额限制 |
+| 区块链工程 | [Solidity 中文文档](https://docs.soliditylang.org/zh-cn/latest/) | 中文 | 页面 HTTP 200 |
+| 区块链工程 | [以太坊中文开发文档](https://ethereum.org/zh/developers/docs/) | 中文 | 待人工复核：网络或配额限制 |
+| 区块链工程 | [Hyperledger Fabric 中文文档](https://hyperledger-fabric.readthedocs.io/zh-cn/latest/) | 中文 | 页面 HTTP 200 |
+| 区块链工程 | [FISCO BCOS 中文文档](https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/) | 中文 | 页面 HTTP 200 |
+| 区块链工程 | [智能合约测试中文指南](https://ethereum.org/zh/developers/docs/smart-contracts/testing/) | 中文 | 待人工复核：网络或配额限制 |
+| AI Infra 与 MLOps | [vLLM 官方推理服务文档](https://docs.vllm.ai/en/latest/) | 英文 | 待人工复核：网络或配额限制 |

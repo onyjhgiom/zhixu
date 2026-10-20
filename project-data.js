@@ -186,6 +186,473 @@ export const projects = [
   }
 ];
 
+// Practice projects for the additional directions.
+projects.push(...[
+  {
+    "id": "transformers-nlp",
+    "roles": [
+      "nlp",
+      "ml"
+    ],
+    "title": "Transformers · 中文文本分类实验",
+    "desc": "从预训练模型到文本分类与实体抽取，理解分词、标签和任务输出头如何协作。以固定数据和词项模型为基线，重点分析领域词汇、长文本截断、错误类别和评测集泄漏。",
+    "url": "https://github.com/huggingface/transformers",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "文本表示",
+      "信息抽取",
+      "语义理解"
+    ],
+    "practice": "选择能在现有设备运行的小型文本模型，保存数据切分与分词配置；复现分类或抽取任务，并比较逐类 F1、延迟和固定失败样本。",
+    "deliverable": "训练配置、分类或抽取接口与误差分析"
+  },
+  {
+    "id": "hanlp-nlp",
+    "roles": [
+      "nlp",
+      "agent"
+    ],
+    "title": "HanLP · 中文信息抽取流水线",
+    "desc": "围绕中文分词、实体与句法结果构建信息抽取流程。关注模型输出与原文偏移的对齐、混合语言边界和领域词汇，把自然语言处理结果转为可检查的结构化记录。",
+    "url": "https://github.com/hankcs/HanLP",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "文本表示",
+      "信息抽取",
+      "语义理解"
+    ],
+    "practice": "根据文档运行一组中文句子，检查分词、实体和偏移；建立领域样例集，对照词典或模型变化，记录边界错误与类型错误。",
+    "deliverable": "文本抽取脚本、标注规范与错误对照集"
+  },
+  {
+    "id": "recbole",
+    "roles": [
+      "recsys",
+      "ml"
+    ],
+    "title": "RecBole · 推荐召回与排序评测",
+    "desc": "通过统一框架理解推荐数据、模型和评价口径之间的关系。关注时间切分、候选池与负采样，比较热门或协同过滤基线和学习模型，防止把实验配置差异误认为模型提升。",
+    "url": "https://github.com/RUCAIBox/RecBole",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "召回排序",
+      "特征工程",
+      "离线评估"
+    ],
+    "practice": "使用一个小数据集与最小模型，固定随机种子和时间切分；对比 Recall 与 NDCG，单独报告新用户和低活跃用户表现。",
+    "deliverable": "可复现配置、指标表与分组结果"
+  },
+  {
+    "id": "gorse",
+    "roles": [
+      "recsys",
+      "backend"
+    ],
+    "title": "Gorse · 推荐服务与冷启动",
+    "desc": "把用户、物品与反馈连接为可查询的推荐服务，理解离线任务与在线接口的协作。重点观察无交互用户、历史不足物品以及数据更新后的候选变化，建立可解释的回退机制。",
+    "url": "https://github.com/gorse-io/gorse",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "召回排序",
+      "特征工程",
+      "离线评估"
+    ],
+    "practice": "导入本地示例反馈与物品，配置推荐接口；对新用户、空反馈与批量更新分别测试，记录候选、延迟和回退规则。",
+    "deliverable": "推荐服务、数据导入与冷启动测试"
+  },
+  {
+    "id": "flutter-samples",
+    "roles": [
+      "mobile",
+      "frontend"
+    ],
+    "title": "Flutter Samples · 跨端应用实践",
+    "desc": "从官方样例学习组件、状态与异步数据流，理解界面重建与平台能力的边界。选择小型应用逐步增加本地状态和异常页面，避免只在模拟器正常网络下验证功能。",
+    "url": "https://github.com/flutter/samples",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "Android",
+      "Flutter",
+      "跨端应用"
+    ],
+    "practice": "运行一个列表或状态样例，增加收藏与本地存储；测试旋转、字体放大、网络失败及重新启动，记录平台适配差异。",
+    "deliverable": "可安装演示、状态设计与设备测试清单"
+  },
+  {
+    "id": "nowinandroid",
+    "roles": [
+      "mobile",
+      "software"
+    ],
+    "title": "Now in Android · 原生应用架构",
+    "desc": "通过完整 Android 示例理解界面、数据层和模块协作。关注声明式状态、离线数据、依赖与测试边界，沿一次用户操作追踪从页面到持久化的完整数据流。",
+    "url": "https://github.com/android/nowinandroid",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "Android",
+      "Flutter",
+      "跨端应用"
+    ],
+    "practice": "按官方说明运行兼容构建，跟踪一个列表和收藏流程；为一个小变更增加测试，观察前后台切换、离线和重启后的状态。",
+    "deliverable": "原生应用小改动、数据流图与回归记录"
+  },
+  {
+    "id": "godot-demos",
+    "roles": [
+      "game",
+      "graphics"
+    ],
+    "title": "Godot Demos · 2D 游戏玩法实验",
+    "desc": "以可运行的演示学习场景、输入、物理和动画的组合，明确游戏逻辑与渲染频率的差异。通过角色状态、关卡重置与资源生命周期，把独立技术点组成可玩的完整闭环。",
+    "url": "https://github.com/godotengine/godot-demo-projects",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "游戏循环",
+      "物理与动画",
+      "玩法系统"
+    ],
+    "practice": "选择与引擎版本匹配的 2D 示例，增加计分、暂停和重开；在不同帧率下检查移动与碰撞，记录试玩反馈和资源变化。",
+    "deliverable": "可玩小游戏、状态图与试玩复盘"
+  },
+  {
+    "id": "cocos-engine",
+    "roles": [
+      "game",
+      "software"
+    ],
+    "title": "Cocos Engine · 组件与场景机制",
+    "desc": "沿引擎组件、事件和资源管理理解游戏对象的运行机制。结合 Cocos Creator 中文指南，从小型场景观察脚本生命周期、场景切换与事件清理，避免把引擎当作不可分析的工具。",
+    "url": "https://github.com/cocos/cocos-engine",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "游戏循环",
+      "物理与动画",
+      "玩法系统"
+    ],
+    "practice": "按文档选择兼容编辑器与引擎版本，建立最小组件场景；跟踪创建、激活、失活和销毁，测试对象池重置及场景重复加载。",
+    "deliverable": "组件实验、生命周期记录与资源检查"
+  },
+  {
+    "id": "threejs",
+    "roles": [
+      "graphics",
+      "frontend"
+    ],
+    "title": "Three.js · 交互式三维展厅",
+    "desc": "在浏览器中连接相机、几何、材质与交互，理解场景对象如何进入实时渲染管线。重点比较坐标变换、颜色管理与资源开销，把视觉效果写成可以复现实验的参数与步骤。",
+    "url": "https://github.com/mrdoob/three.js",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "渲染管线",
+      "Shader",
+      "三维交互"
+    ],
+    "practice": "从基础示例搭建三维场景，加入拾取与材质切换；测试不同窗口和设备，记录绘制调用、纹理资源及场景销毁后的释放。",
+    "deliverable": "三维展厅、参数说明与性能对照"
+  },
+  {
+    "id": "learnopengl",
+    "roles": [
+      "graphics",
+      "foundation"
+    ],
+    "title": "LearnOpenGL · 渲染管线小实验",
+    "desc": "通过低层图形示例理解顶点、纹理、法线、光照与深度测试，避免只记忆渲染 API。结合中文教程对照 Shader 输入输出，说明矩阵顺序和颜色空间对最终像素的影响。",
+    "url": "https://github.com/JoeyDeVries/LearnOpenGL",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "渲染管线",
+      "Shader",
+      "三维交互"
+    ],
+    "practice": "选择基础变换和光照章节对应代码，固定相机与灯光；分别改变法线、纹理和颜色转换，对照画面及 Shader 计算解释结果。",
+    "deliverable": "渲染实验、着色器说明与结果截图"
+  },
+  {
+    "id": "mlflow",
+    "roles": [
+      "mlops",
+      "ml",
+      "ops"
+    ],
+    "title": "MLflow · 模型实验与版本追踪",
+    "desc": "用可追溯实验连接数据、参数、评测与模型工件，理解模型生命周期不止保存权重。通过两组小实验建立基线、记录环境和恢复方法，为后续灰度与回滚提供版本依据。",
+    "url": "https://github.com/mlflow/mlflow",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "实验管理",
+      "模型服务",
+      "推理优化"
+    ],
+    "practice": "使用轻量模型记录数据切分、参数、指标和工件；在新目录恢复一次运行，检查模型契约，并整理新旧版本的固定评测对照。",
+    "deliverable": "实验台账、模型版本与可重现评测"
+  },
+  {
+    "id": "vllm",
+    "roles": [
+      "mlops",
+      "posttrain",
+      "ops"
+    ],
+    "title": "vLLM · 模型推理服务性能实验",
+    "desc": "理解语言模型推理中的批处理、缓存与执行阶段，比较首 token 延迟、吞吐和显存。性能结论需要与模型、硬件、输入输出长度及并发一起解释，并保留质量验证。",
+    "url": "https://github.com/vllm-project/vllm",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "实验管理",
+      "模型服务",
+      "推理优化"
+    ],
+    "practice": "根据硬件支持选择小模型与运行方式，在固定请求集上改变并发和长度；记录首 token、总延迟、吞吐、显存及任务质量。",
+    "deliverable": "模型服务、负载脚本与性能矩阵"
+  },
+  {
+    "id": "mininet",
+    "roles": [
+      "network",
+      "ops"
+    ],
+    "title": "Mininet · 可复现网络拓扑",
+    "desc": "使用虚拟主机、链路与交换建立可控网络，观察地址、转发与请求时序。通过人为设置延迟和链路故障，把协议概念转为能重复验证的拓扑与诊断证据。",
+    "url": "https://github.com/mininet/mininet",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "交换与路由",
+      "协议分析",
+      "网络排障"
+    ],
+    "practice": "在支持的隔离环境建立多主机拓扑，配置地址和路由；改变延迟或断开链路，对照抓包、路径和可达性，保存恢复步骤。",
+    "deliverable": "拓扑脚本、地址规划与故障时间线"
+  },
+  {
+    "id": "frrouting",
+    "roles": [
+      "network",
+      "cloud"
+    ],
+    "title": "FRRouting · 动态路由实验",
+    "desc": "围绕路由协议、邻居与转发表理解控制平面和数据平面的关系。通过最小拓扑观察路由建立、链路变化和收敛，建立配置变更、验证与回退的工程流程。",
+    "url": "https://github.com/FRRouting/frr",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "交换与路由",
+      "协议分析",
+      "网络排障"
+    ],
+    "practice": "按官方说明在虚拟网络运行最小路由示例，记录邻居和路由表；注入一次链路故障，对比收敛期间丢包与恢复，验证配置回退。",
+    "deliverable": "路由配置、收敛记录与变更报告"
+  },
+  {
+    "id": "ros2-examples",
+    "roles": [
+      "robotics",
+      "embedded"
+    ],
+    "title": "ROS 2 Examples · 消息与节点实验",
+    "desc": "从官方最小节点示例理解发布订阅、服务和执行器，检查消息类型、QoS 与运行环境。把通信是否建立与数据的坐标、时间语义分开验证，为仿真系统提供可靠组件边界。",
+    "url": "https://github.com/ros2/examples",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "ROS 2",
+      "感知定位",
+      "规划控制"
+    ],
+    "practice": "选择与 ROS 2 发行版兼容的样例，运行发布订阅和服务；修改频率与 QoS，记录正常、失配和恢复过程，并解释消息时序。",
+    "deliverable": "节点代码、配置清单与通信排查记录"
+  },
+  {
+    "id": "webots",
+    "roles": [
+      "robotics",
+      "cv",
+      "embedded"
+    ],
+    "title": "Webots · 移动机器人导航仿真",
+    "desc": "在可重复的仿真世界内连接传感器、运动与控制，分析理想路径和实际轨迹的差异。重点记录地图、设备参数与噪声，为障碍、时延和定位错误建立可验证的停止行为。",
+    "url": "https://github.com/cyberbotics/webots",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "ROS 2",
+      "感知定位",
+      "规划控制"
+    ],
+    "practice": "从小型移动机器人样例起步，固定世界与控制参数；记录轨迹和误差，加入障碍或传感器异常，验证告警与停止并说明仿真边界。",
+    "deliverable": "仿真世界、导航演示与异常验证"
+  },
+  {
+    "id": "llvm-project",
+    "roles": [
+      "compiler",
+      "foundation"
+    ],
+    "title": "LLVM · 小语言与中间表示",
+    "desc": "从官方教程的小语言构建前端与中间表示，理解语法树、类型和代码生成的衔接。只选必要组件与示例，重点验证 IR 语义、错误诊断和优化前后行为，而非追求完整工具链功能。",
+    "url": "https://github.com/llvm/llvm-project",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "语法分析",
+      "中间表示",
+      "代码生成"
+    ],
+    "practice": "按文档选择可用的发行工具链或最小构建，完成表达式到 IR 的示例；实现一个小扩展，用正反例和差分执行验证含义。",
+    "deliverable": "小语言原型、IR 对照与测试集"
+  },
+  {
+    "id": "crafting-interpreters",
+    "roles": [
+      "compiler",
+      "software"
+    ],
+    "title": "Crafting Interpreters · 自制解释器",
+    "desc": "通过一门小语言理解词法、解析、作用域与解释执行的配合。关注错误位置、变量生命周期和求值顺序，通过边界程序解释语言语义，不把演示成功当作正确性证明。",
+    "url": "https://github.com/munificent/craftinginterpreters",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "高阶",
+    "tags": [
+      "语法分析",
+      "中间表示",
+      "代码生成"
+    ],
+    "practice": "按章节选择树遍历解释器实现，加入变量或块作用域；构造非法表达式、名称遮蔽和重复运行测试，记录诊断与执行输出。",
+    "deliverable": "解释器、语言说明与正反例回归"
+  },
+  {
+    "id": "solidity-engineering",
+    "roles": [
+      "blockchain",
+      "security"
+    ],
+    "title": "Solidity · 本地合约与状态验证",
+    "desc": "通过合约语言与本地链理解状态修改、权限和失败回滚，围绕不变量组织测试。工程重点是可验证行为与信任边界，而不是交易或资产展示；示例只使用开发账户和本地测试数据。",
+    "url": "https://github.com/argotorg/solidity",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "智能合约",
+      "状态机",
+      "链上应用"
+    ],
+    "practice": "使用官方文档与兼容工具链编写证书登记合约，测试权限和边界；记录交易回执、事件及状态，验证失败操作不会破坏不变量。",
+    "deliverable": "本地合约、权限矩阵与自动化测试"
+  },
+  {
+    "id": "fabric-samples",
+    "roles": [
+      "blockchain",
+      "distributed"
+    ],
+    "title": "Fabric Samples · 联盟链流程实验",
+    "desc": "通过测试网络理解组织身份、背书、提交与账本状态的基本协作，区分许可网络与公开网络的假设。结合查询和事件消费说明链上事实、应用缓存和确认语义之间的关系。",
+    "url": "https://github.com/hyperledger/fabric-samples",
+    "location": {
+      "region": "global",
+      "label": "全球协作",
+      "note": "开源社区协作，未指定线下项目地点"
+    },
+    "level": "进阶",
+    "tags": [
+      "智能合约",
+      "状态机",
+      "链上应用"
+    ],
+    "practice": "按样例启动本地测试网络并执行查询与写入，记录身份和交易状态；重启应用后重放事件，与账本核对并整理恢复步骤。",
+    "deliverable": "测试网络、调用脚本与事件重放报告"
+  }
+]);
+
 export function repositoryUrl(value) {
   try {
     const url = new URL(value);

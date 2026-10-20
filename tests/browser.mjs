@@ -16,7 +16,7 @@ try {
   await navigate('home');
   assert.equal(await page.locator('.path-card').count(),6);await noOverflow();
   await page.screenshot({path:artifacts+'home-desktop.png',fullPage:true});
-  await page.getByRole('button',{name:'人工智能',exact:true}).click();assert.equal(await page.locator('.path-card').count(),paths.filter(p=>p.category==='ai').length);
+  await page.getByRole('button',{name:'人工智能',exact:true}).click();assert.equal(await page.locator('.path-card').count(),Math.min(6,paths.filter(p=>p.category==='ai').length));
   await page.locator('.card-open[data-path="agent"]').click();
   await page.getByRole('button',{name:'加入我的学习',exact:true}).click();
   await page.locator('#stage-0').check();await page.locator('#stage-1').check();

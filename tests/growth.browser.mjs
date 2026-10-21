@@ -1,0 +1,131 @@
+import { chromium, expect } from '@playwright/test';
+import assert from 'node:assert/strict';
+import { mkdir, readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { professionalDirections, professionalRoles } from '../professional-data.js';
+import { assessmentQuestions } from '../growth-core.js';
+
+const base = (process.env.TEST_BASE_URL || 'http://127.0.0.1:4173').replace(/\/$/, '');
+const artifacts = fileURLToPath(new URL('../artifacts/', import.meta.url));
+await mkdir(artifacts, { recursive: true });
+let browser;
+try { browser = await chromium.launch({ channel: 'msedge', headless: true }); }
+catch { browser = await chromium.launch({ channel: 'chrome', headless: true }); }
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce', colorScheme: 'dark', acceptDownloads: true });
+const page = await context.newPage(), errors = [];
+page.on('pageerror', error => errors.push(error.message));
+const navigate = async hash => { await page.goto(`${base}/#${hash}`); await expect(page.locator('body')).toHaveAttribute('data-page', hash.split('?')[0]); await expect(page.locator('#content h1').first()).toBeVisible(); };
+const growthState = () => page.evaluate(() => JSON.parse(localStorage.getItem('zhixu-growth-v1') || '{}'));
+const legacy = { joined: ['backend'], saved: ['mdn'], done: { backend: [0] }, plan: null, drafts: [] };
+
+try {
+  await navigate('home');
+  await page.evaluate(value => { localStorage.setItem('zhixu-learning-v1', JSON.stringify(value)); }, legacy);
+  const legacyBefore = await page.evaluate(() => localStorage.getItem('zhixu-learning-v1'));
+  await navigate('growth');
+  assert.equal(await page.locator('.growth-direction').count(), 8);
+  for (const direction of professionalDirections) {
+    await navigate(`growth?direction=${direction.id}`);
+    assert.equal(await page.locator('#content h1').innerText(), direction.title);
+    assert.equal(await page.locator('.growth-skill').count(), 6);
+    const content = await page.locator('#content').textContent();
+    for (const stage of direction.stages) assert.ok(content.includes(stage.title));
+    assert.ok(content.includes(direction.project.title));
+    for (const q of direction.questions) assert.ok(content.includes(q.title));
+    assert.ok(await page.locator('.growth-resource-reason').count() >= 3);
+  }
+  await navigate('roles');
+  assert.equal(await page.locator('.growth-role-card').count(), 14);
+  await page.locator('#growth-role-filter [name=direction]').selectOption('frontend');
+  await page.locator('#growth-role-filter button[type=submit]').click();
+  await page.waitForURL(/direction=frontend/);
+  assert.equal(await page.locator('.growth-role-card').count(), professionalRoles.filter(item => item.directionId === 'frontend').length);
+  for (const job of professionalRoles) {
+    await navigate(`role?role=${job.id}`);
+    assert.equal(await page.locator('#content h1').innerText(), job.title);
+    const content = await page.locator('#content').textContent();
+    for (const entry of job.jdKeywords) assert.ok(content.includes(entry.keyword));
+    for (const entry of job.deliverables) assert.ok(content.includes(entry.title));
+  }
+  await navigate('role?role=unknown');
+  assert.ok((await page.locator('#content h1').innerText()).length > 0);
+  await navigate('role?role=frontend-engineer&mode=social');
+  await page.getByRole('link', { name: '测评此岗位', exact: false }).click();
+  await page.waitForURL(/#assessment\?/);
+  await expect(page.locator('#growth-assessment-form [name=mode]')).toHaveValue('social');
+  const form = page.locator('#growth-assessment-form');
+  await form.locator('[name=mode]').selectOption('social');
+  await form.locator('[name=hoursPerWeek]').fill('6');
+  await form.locator('[name=startDate]').fill('2026-11-02');
+  const self = form.locator('select[name^="self:"]');
+  for (let i = 0; i < await self.count(); i++) await self.nth(i).selectOption('4');
+  const qs = assessmentQuestions.filter(item => item.directionId === 'frontend');
+  await form.locator(`input[name="answer:${qs[0].id}"][value="${qs[0].answer}"]`).check();
+  await form.locator(`input[name="answer:${qs[1].id}"][value="${(qs[1].answer + 1) % 4}"]`).check();
+  await form.locator('button[type=submit]').click();
+  await expect(page.locator('.growth-diagnostic-summary')).toBeVisible();
+  let state = await growthState();
+  assert.equal(state.profile.mode, 'social'); assert.equal(state.profile.hoursPerWeek, 6);
+  assert.equal(state.plan.startDate, '2026-11-02'); assert.equal(state.attempts.length, 1);
+  assert.equal(state.answers[qs[0].id], qs[0].answer); assert.ok(!Object.hasOwn(state.answers, qs[2].id));
+  assert.equal(await page.locator('.growth-quiz-explanation').count(), 2);
+  await page.reload();
+  assert.equal(await form.locator('[name=hoursPerWeek]').inputValue(), '6');
+  assert.equal(await form.locator('[name=startDate]').inputValue(), '2026-11-02');
+  await navigate('plan');
+  const count = state.plan.tasks.length;
+  assert.equal(await page.locator('[data-growth-complete]').count(), count);
+  const first = page.locator('[data-growth-complete]').first(), taskId = await first.getAttribute('data-growth-complete');
+  await first.check();
+  await expect(page.locator('[data-growth-complete]').first()).toBeChecked();
+  state = await growthState(); assert.ok(state.completed[taskId]);
+  await page.reload(); await expect(page.locator('[data-growth-complete]').first()).toBeChecked();
+  await page.locator('[data-growth-regenerate]').click();
+  await expect(page.locator('[data-growth-complete]').first()).toBeChecked();
+  assert.equal((await growthState()).plan.startDate, '2026-11-02');
+  let downloading = page.waitForEvent('download'); await page.locator('[data-growth-export=plan]').click();
+  const exportedPlan = await downloading;
+  const planText = await readFile(await exportedPlan.path(), 'utf8');
+  assert.ok(planText.includes('验收') && planText.includes('2026-11-02'));
+  downloading = page.waitForEvent('download'); await page.locator('[data-growth-export=data]').click();
+  const backup = JSON.parse(await readFile(await (await downloading).path(), 'utf8'));
+  assert.ok(backup.completed[taskId]); assert.equal(backup.attempts.length, 1);
+  await page.screenshot({ path: `${artifacts}/growth-plan-populated-desktop.png`, fullPage: true, animations: 'disabled' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: `${artifacts}/growth-plan-populated-mobile.png`, fullPage: true, animations: 'disabled' });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.getByRole('button', { name: '展开导航', exact: true }).click();
+  await page.locator('#main-nav').getByRole('link', { name: '专业学习方向', exact: true }).click();
+  await page.waitForURL('**/#growth');
+  await expect(page.locator('#mobile-menu')).toHaveAttribute('aria-expanded', 'false');
+  await navigate('role?role=fullstack-engineer');
+  await page.locator('[data-growth-make-plan]').click(); await page.waitForURL('**/#plan');
+  state = await growthState();
+  assert.ok(state.plan.tasks.some(item => item.title.includes('前后端')));
+  assert.ok(state.completed[taskId], 'switching roles preserves previous task records');
+  assert.equal(await page.evaluate(() => localStorage.getItem('zhixu-learning-v1')), legacyBefore);
+  await navigate('search?q=' + encodeURIComponent('工程师'));
+  assert.ok(await page.locator('.growth-search-results').count() > 0);
+  await navigate('search?q=' + encodeURIComponent('<img src=x onerror=alert(1)>'));
+  assert.equal(await page.locator('#content img').count(), 0);
+  await navigate('tech'); await page.locator('[data-path=frontend].card-open').click();
+  await expect(page.locator('#detail-dialog')).toBeVisible();
+  await page.locator('#detail-dialog [data-growth-link]').click();
+  await page.waitForURL('**/#growth?direction=frontend');
+  await expect(page.locator('#detail-dialog')).not.toBeVisible();
+
+  const blocked = await browser.newContext({ reducedMotion: 'reduce' });
+  await blocked.addInitScript(() => {
+    Storage.prototype.getItem = function () { throw new DOMException('blocked', 'SecurityError'); };
+    Storage.prototype.setItem = function () { throw new DOMException('blocked', 'SecurityError'); };
+  });
+  const blockedPage = await blocked.newPage(); blockedPage.on('pageerror', error => errors.push(error.message));
+  await blockedPage.goto(`${base}/#assessment`);
+  await blockedPage.locator('#growth-assessment-form button[type=submit]').click();
+  await expect(blockedPage.locator('.growth-diagnostic-summary')).toBeVisible();
+  await blockedPage.goto(`${base}/#growth`);
+  await expect(blockedPage.locator('.growth-direction')).toHaveCount(8);
+  await blocked.close();
+  assert.deepEqual(errors, []);
+  console.log('Growth browser checks passed: eight full directions, 14 role profiles, filtering, answers/self-assessment, unknowns, dated planning, completion/reload/regeneration, exports, cross-role projects, legacy data preservation, search, dialog links, mobile layout and restricted storage.');
+} finally { await context.close(); await browser.close(); }

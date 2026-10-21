@@ -14,7 +14,9 @@
     "test:motion": "node tests/motion.mjs",
     "test:fluid": "node tests/fluid.mjs",
     "test:projects": "node tests/projects.browser.mjs",
-    "test:workspace": "node tests/workspace.browser.mjs"
+    "test:workspace": "node tests/workspace.browser.mjs",
+    "test:growth": "node tests/growth.browser.mjs",
+    "test:growth:layout": "node tests/growth-layout.browser.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1"

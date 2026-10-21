@@ -1,5 +1,6 @@
 import { createCareer } from './career-ui.js';
 import { createProjects } from './project-ui.js';
+import { createGrowth } from './growth-ui.js';
 import { paths, categories, resources, examTopics, examLinks, helpServices } from './data.js';
 import { escapeHtml as e, matchesQuery, progressFor, sanitizeState, buildExamPlan } from './core.js';
 let disposeHomeMotion = () => {};
@@ -51,16 +52,17 @@ const dialog = document.getElementById('detail-dialog');
 const content = document.getElementById('content');
 const career=createCareer({paths,resources,resourceRow,icon,e,toast,go,closeDialog,exportFile});
 const projectLab=createProjects({paths,icon,e,closeDialog});
-const titles = {workspace:'我的学习空间',projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
+const growth=createGrowth({e,icon,toast,go,render,resourceRow,exportFile,closeDialog});
+const titles = {growth:'专业学习方向',roles:'岗位能力地图',role:'岗位能力详情',assessment:'能力测评与诊断',plan:'个性化成长计划',workspace:'我的学习空间',projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};
 function route() { return location.hash.slice(1).split('?')[0] || 'home'; }
 function query() { return new URLSearchParams(location.hash.split('?')[1] || '').get('q') || ''; }
 function toast(text) { const el=document.getElementById('toast'); el.textContent=text;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),3000); }
 function persist() { try { localStorage.setItem(storageKey,JSON.stringify(state));storageAvailable=true;return true; } catch { storageAvailable=false;toast('浏览器未能保存记录，当前操作仅在本次页面停留期间有效。');return false; } }
 function go(page) { if(location.hash === `#${page}`) render();else location.hash=page; }
 function nav() {
-  const primary=[['home','grid','学习概览'],['tech','code','技术成长'],['roadmaps','branch','学习路线'],['resources','book','资料库'],['projects','code','项目实践'],['interviews','users','求职面试'],['exam','cap','考研升学'],['support','users','考研帮扶']];
-  const personal=[['workspace','grid','空间主页'],['learning','calendar','我的学习'],['saved','bookmark','我的收藏']];
-  const link=([id,i,title])=>`<a href="#${id}" class="nav-item ${route()===id?'active':''}" ${route()===id?'aria-current="page"':''}>${icon(i)}<span>${title}</span>${id==='saved'&&state.saved.length?`<span class="nav-count">${state.saved.length}</span>`:''}</a>`;
+  const primary=[['home','grid','学习概览'],['growth','compass','专业学习方向'],['roles','users','岗位能力地图'],['assessment','chart','能力测评'],['tech','code','技术成长'],['roadmaps','branch','学习路线'],['resources','book','资料库'],['projects','code','项目实践'],['interviews','users','求职面试'],['exam','cap','考研升学'],['support','users','考研帮扶']];
+  const personal=[['workspace','grid','空间主页'],['plan','calendar','成长计划'],['learning','calendar','我的学习'],['saved','bookmark','我的收藏']];
+  const link=([id,i,title])=>{const active=route()===id||(id==='roles'&&route()==='role');return `<a href="#${id}" class="nav-item ${active?'active':''}" ${active?'aria-current="page"':''}>${icon(i)}<span>${title}</span>${id==='saved'&&state.saved.length?`<span class="nav-count">${state.saved.length}</span>`:''}</a>`;};
   document.getElementById('main-nav').innerHTML=primary.map(link).join('');document.getElementById('personal-nav').innerHTML=personal.map(link).join('');document.getElementById('page-title').textContent=titles[route()] || titles.home;
   const profile=document.querySelector('.local-profile');
   profile.classList.toggle('active',route()==='workspace');
@@ -151,15 +153,19 @@ function learningPage() {
 }
 function searchPage() {
   const q=query().trim();if(!q) return empty('输入你想学习的内容','可以搜索「Agent」「机器学习」「前端」或资料名称。');
-  const foundCareer=career.search(q), foundProjects=projectLab.search(q);
+  const foundCareer=career.search(q), foundProjects=projectLab.search(q), foundGrowth=growth.search(q);
   const foundPaths=paths.filter(p=>matchesQuery(p,q)), foundResources=resources.filter(r=>matchesQuery({...r,tags:r.paths.map(id=>itemById(id)?.title||'')},q)), foundExam=examTopics.filter(p=>matchesQuery(p,q));
-  return `<div class="page-header"><div><h1>搜索 <span class="query-label">“${e(q)}”</span></h1><p>找到 ${foundPaths.length} 条技术路线、${foundResources.length} 份资料、${foundExam.length} 个考研专题、${foundProjects.count} 个实践项目与 ${foundCareer.count} 项求职内容。</p></div><button class="btn btn-secondary" data-action="clear-search">清除搜索 ${icon('close')}</button></div>${foundPaths.length?`<h2 class="search-heading">技术学习路线</h2><div class="path-grid">${foundPaths.map(p=>card(p)).join('')}</div>`:''}${foundResources.length?`<h2 class="search-heading">学习资料</h2><div class="resource-list">${foundResources.map(r=>resourceRow(r,true)).join('')}</div>`:''}${foundExam.length?`<h2 class="search-heading">考研知识梳理</h2><div class="path-grid">${foundExam.map(p=>card(p)).join('')}</div>`:''}${foundProjects.markup}${foundCareer.markup}${!foundPaths.length&&!foundResources.length&&!foundExam.length&&!foundCareer.count&&!foundProjects.count?empty('还没有找到相关内容','试试更简短的关键词，或浏览所有学习方向。'):''}`;
+  return `<div class="page-header"><div><h1>搜索 <span class="query-label">“${e(q)}”</span></h1><p>找到 ${foundPaths.length} 条技术路线、${foundResources.length} 份资料、${foundExam.length} 个考研专题、${foundProjects.count} 个实践项目、${foundCareer.count} 项求职内容与 ${foundGrowth.count} 项专业成长内容。</p></div><button class="btn btn-secondary" data-action="clear-search">清除搜索 ${icon('close')}</button></div>${foundPaths.length?`<h2 class="search-heading">技术学习路线</h2><div class="path-grid">${foundPaths.map(p=>card(p)).join('')}</div>`:''}${foundResources.length?`<h2 class="search-heading">学习资料</h2><div class="resource-list">${foundResources.map(r=>resourceRow(r,true)).join('')}</div>`:''}${foundExam.length?`<h2 class="search-heading">考研知识梳理</h2><div class="path-grid">${foundExam.map(p=>card(p)).join('')}</div>`:''}${foundProjects.markup}${foundCareer.markup}${foundGrowth.markup}${!foundPaths.length&&!foundResources.length&&!foundExam.length&&!foundCareer.count&&!foundProjects.count&&!foundGrowth.count?empty('还没有找到相关内容','试试更简短的关键词，或浏览所有学习方向。'):''}`;
 }
 function render() {
-  const views={workspace:workspacePage,projects:projectLab.page,interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
+  const views={growth:growth.page,roles:growth.page,role:growth.page,assessment:growth.page,plan:growth.page,workspace:workspacePage,projects:projectLab.page,interviews:career.page,home,tech:()=>technology(),roadmaps:()=>technology(true),resources:()=>resourcePage(),saved:()=>resourcePage(true),exam:examPage,support:supportPage,learning:learningPage,search:searchPage};
   disposeHomeMotion();
   disposeFluidMotion();
   nav();document.body.dataset.page=route();content.innerHTML=(views[route()] || home)();document.title=`${titles[route()] || titles.home} · 知序`;
+  if(['home','tech','roadmaps','workspace'].includes(route())) {
+    const anchor=content.querySelector(route()==='home'?'.hero':'.page-header, .workspace-hero');
+    anchor?.insertAdjacentHTML('afterend',growth.preview());
+  }
   disposeHomeMotion = mountHomeMotion();
   disposeFluidMotion = mountFluidMotion();
 }
@@ -176,7 +182,8 @@ function showPath(id,keepFocus=false) {
   const p=itemById(id);if(!p)return;
   const progress=progressFor(p,state), joined=state.joined.includes(id), related=resources.filter(r=>r.paths.includes(id));
   const markup=dialogHeader(p.en || 'POSTGRADUATE STUDY',p.title,p.desc)+`<div class="dialog-body"><div class="dialog-lead"><span id="dialog-progress">${progress.count}/${progress.total} 个阶段已完成 · ${progress.percent}%</span><button class="btn ${joined?'btn-secondary':'btn-primary'}" data-join="${id}">${icon(joined?'check':'calendar')}${joined?'已加入我的学习':'加入我的学习'}</button></div><ol class="stage-list">${p.stages.map(([title,desc],i)=>`<li class="stage-item ${(state.done[id]||[]).includes(i)?'completed':''}"><input class="stage-check" type="checkbox" id="stage-${i}" data-stage="${i}" data-item="${id}" ${(state.done[id]||[]).includes(i)?'checked':''}><label for="stage-${i}">${title}</label><p>${desc}</p></li>`).join('')}</ol>${curriculumMarkup(p)}${related.length?`<h3 class="dialog-subtitle">搭配这些资料开始学习</h3><div class="resource-list dialog-resources">${related.map(r=>resourceRow(r,true)).join('')}</div>`:''}${!p.id.startsWith('exam-')?projectLab.preview(p.id)+career.preview(p.id):''}<div class="notice">${icon('info')}<span>${p.id.startsWith('exam-')?'提纲用于组织复习，实际范围请核对目标专业当年考试要求。':'阶段顺序是一份起点，可以根据已有基础调整学习节奏。'} 勾选阶段会自动加入学习，记录保存在当前浏览器。</span></div></div>`;
-  if(keepFocus){document.getElementById('dialog-content').innerHTML=markup;dialog.querySelector('[data-join]')?.focus({preventScroll:true});return;}showDialog(markup);
+  const enriched=markup.replace('<div class="dialog-body">','<div class="dialog-body">'+growth.preview(p.id));
+  if(keepFocus){document.getElementById('dialog-content').innerHTML=enriched;dialog.querySelector('[data-join]')?.focus({preventScroll:true});return;}showDialog(enriched);
 }
 function showGuide() {
   showDialog(dialogHeader('FIND YOUR STARTING POINT','从现在的你，找到下一步。','选择最接近你当前目标的一项。')+`<div class="dialog-body"><div class="guide-options"><button class="guide-option" data-guide="foundation">${icon('book')}<strong>我刚开始学习计算机</strong><p>先补齐程序、系统与算法基础，再选择具体方向。</p></button><button class="guide-option" data-guide="ai">${icon('bot')}<strong>我想进入 AI 与大模型</strong><p>按已有基础，从机器学习、深度学习走向模型与应用。</p></button><button class="guide-option" data-guide="engineering">${icon('code')}<strong>我想做出完整的产品</strong><p>从前后端到测试与交付，选择一条工程实践路线。</p></button><button class="guide-option" data-guide="exam">${icon('cap')}<strong>我正在准备计算机考研</strong><p>先核对目标考试科目，再安排专业课梳理与复习计划。</p></button></div><p class="onboarding-tip">暂时不确定也没关系。先打开一条路线，看看第一个任务是否适合现在的自己。</p></div>`);

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 const root = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(process.env.PORT || 4173);
-const publicFiles = new Set(['index.html', 'style.css', 'app.js', 'data.js', 'core.js', 'career-data.js', 'career-ui.js', 'project-data.js', 'project-ui.js', 'favicon.svg']);
+const publicFiles = new Set(['index.html', 'style.css', 'app.js', 'data.js', 'core.js', 'career-data.js', 'career-ui.js', 'project-data.js', 'project-ui.js', 'professional-data.js', 'growth-core.js', 'growth-ui.js', 'growth.css', 'favicon.svg']);
 const types = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.svg':'image/svg+xml' };
 http.createServer(async (req, res) => {
   if (!['GET','HEAD'].includes(req.method)) { res.writeHead(405, {'Allow':'GET, HEAD'}); res.end(); return; }

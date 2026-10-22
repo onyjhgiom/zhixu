@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {paths,resources} from '../data.js';
 import {companies,rolePrep,questions,experiences,experienceUrl} from '../career-data.js';
+import {professionalRoles} from '../professional-data.js';
 import {sanitizeCareerState} from '../core.js';
 test('every learning direction has substantial resources and both written and interview preparation',()=>{
  const roles=new Set(paths.map(p=>p.id));
@@ -11,8 +12,12 @@ test('every learning direction has substantial resources and both written and in
 });
 test('company and experience references resolve without pretending that editorial exercises are company questions',()=>{
  const companyIds=new Set(companies.map(c=>c.id)),roleIds=new Set(paths.map(p=>p.id));
- assert.equal(companyIds.size,11);
- for(const c of companies){assert.equal(new URL(c.url).protocol,'https:');assert.ok(c.scenario && c.prompts.length >= 3);for(const p of paths){const url=new URL(experienceUrl(c,p));assert.equal(url.hostname,'www.nowcoder.com');assert.ok(url.searchParams.get('query').includes(p.title));}}
+ assert.equal(companyIds.size,12);
+ const professionalRoleIds=new Set(professionalRoles.map(role=>role.id));
+ for(const c of companies){assert.equal(new URL(c.url).protocol,'https:');assert.ok(c.scenario && c.prompts.length >= 3);for(const family of c.roleFamilies||[]){assert.ok(family.title&&family.focus);assert.ok(family.pathIds.length);for(const id of family.pathIds)assert.ok(roleIds.has(id),`${c.id}/${family.id} references ${id}`);if(family.professionalRoleId)assert.ok(professionalRoleIds.has(family.professionalRoleId));}for(const p of paths){const url=new URL(experienceUrl(c,p));assert.equal(url.hostname,'www.nowcoder.com');assert.ok(url.searchParams.get('query').includes(p.title));}}
+ const huawei=companies.find(company=>company.id==='huawei');
+ assert.equal(huawei.roleFamilies.length,14);
+ for(const title of ['AI Infra 工程师','软件开发工程师','芯片与器件工程师','智能驾驶算法工程师'])assert.ok(huawei.roleFamilies.some(role=>role.title===title));
  for(const x of experiences){assert.ok(companyIds.has(x.company));for(const id of x.roles)assert.ok(roleIds.has(id));assert.equal(new URL(x.url).hostname,'www.nowcoder.com');assert.ok(x.date);}
  for(const q of questions)assert.equal(q.origin,'站内原创练习');
 });

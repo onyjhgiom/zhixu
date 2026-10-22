@@ -43,12 +43,12 @@ test('renaming robotics preserves legacy progress, saved resources and interview
   assert.equal(career.notes['robotics@tencent'].text, '已有机器人复盘');
 });
 
-test('all six added companies provide official and role-specific experience links', () => {
-  for (const id of ['meituan', 'zhipu', 'jd', 'baidu', 'mihoyo', 'netease']) {
+test('all seven added companies provide official and role-specific experience links', () => {
+  for (const id of ['meituan', 'zhipu', 'jd', 'baidu', 'mihoyo', 'netease', 'huawei']) {
     const company = companies.find(item => item.id === id);
     assert.ok(company);
     assert.equal(new URL(company.url).protocol, 'https:');
-    assert.equal(company.verifiedAt, '2026-10-22');
+    assert.equal(company.verifiedAt, id === 'huawei' ? '2026-10-23' : '2026-10-22');
     for (const pathId of ['game', 'robotics', 'driving']) {
       const path = paths.find(item => item.id === pathId);
       const query = new URL(experienceUrl(company, path)).searchParams.get('query');
@@ -56,4 +56,8 @@ test('all six added companies provide official and role-specific experience link
       assert.ok(query.includes(company.title));
     }
   }
+  const huawei = companies.find(item => item.id === 'huawei');
+  assert.equal(huawei.roleFamilies.length, 14);
+  assert.ok(huawei.roleFamilies.some(role => role.pathIds.includes('robotics')));
+  assert.ok(huawei.roleFamilies.some(role => role.pathIds.includes('driving')));
 });

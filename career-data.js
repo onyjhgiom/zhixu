@@ -114,7 +114,31 @@ companies.push(
   { id: 'jd', title: '京东', en: 'JD.com', mark: '京', color: '#b74448', url: 'https://zhaopin.jd.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '零售供应链与物流技术', scenario: '以零售交易、仓储履约、配送或机器人系统为练习背景', prompts: ['围绕库存、订单和物流链路讨论一致性', '解释仓储机器人数据、调度与系统接口', '准备并发容量、异常恢复和工程交付证据'], keywords: ['京东', 'JD', '物流', '供应链'] },
   { id: 'baidu', title: '百度', en: 'Baidu', mark: '百', color: '#4366b4', url: 'https://talent.baidu.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '搜索、模型与智能驾驶', scenario: '以搜索服务、模型应用或 Apollo 驾驶仿真为练习背景', prompts: ['区分搜索检索排序、模型服务与驾驶算法', '准备感知融合、规划控制或车载测试的具体证据', '解释数据闭环、场景覆盖和版本回归'], keywords: ['百度', 'Baidu', 'Apollo', '智能驾驶', '文心'] },
   { id: 'mihoyo', title: '米哈游', en: 'miHoYo', mark: '米', color: '#2a8795', url: 'https://jobs.mihoyo.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '游戏技术与互动内容', scenario: '以游戏客户端、引擎渲染、服务端或技术工具为练习背景', prompts: ['讲清帧循环、资源生命周期和性能分析', '准备渲染、网络同步或自动化质量的独立项目', '说明美术协作、工具效率和跨平台边界'], keywords: ['米哈游', 'miHoYo', '游戏', '原神', '星穹铁道'] },
-  { id: 'netease', title: '网易', en: 'NetEase', mark: '网', color: '#a2505d', url: 'https://hr.163.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '游戏、内容与互联网服务', scenario: '以在线游戏、内容产品、音视频或高并发服务为练习背景', prompts: ['准备客户端、游戏服务端或内容推荐的工程证据', '讨论多人状态、质量保障与线上稳定性', '用指标与失败复盘说明业务和技术取舍'], keywords: ['网易', 'NetEase', '游戏', '云音乐', '有道'] }
+  { id: 'netease', title: '网易', en: 'NetEase', mark: '网', color: '#a2505d', url: 'https://hr.163.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '游戏、内容与互联网服务', scenario: '以在线游戏、内容产品、音视频或高并发服务为练习背景', prompts: ['准备客户端、游戏服务端或内容推荐的工程证据', '讨论多人状态、质量保障与线上稳定性', '用指标与失败复盘说明业务和技术取舍'], keywords: ['网易', 'NetEase', '游戏', '云音乐', '有道'] },
+  {
+    id: 'huawei', title: '华为', en: 'Huawei', mark: '华', color: '#c63b45',
+    url: 'https://career.huawei.com/reccampportal/portal5/index.html', linkLabel: '官方招聘', verifiedAt: '2026-10-23',
+    theme: '连接、计算、云与智能终端',
+    scenario: '以通信网络、基础软件、昇腾 AI、云服务、智能终端或智能汽车解决方案为练习背景',
+    prompts: ['从操作系统、网络、芯片或算法底层机制解释方案边界', '准备性能、可靠性、功耗、安全与工程交付的量化证据', '根据具体 JD 核对业务线、工作地点、招聘类型与技术栈'],
+    keywords: ['华为', 'Huawei', '鸿蒙', '昇腾', '鲲鹏', '云服务', '通信', '芯片', '智能驾驶'],
+    roleFamilies: [
+      { id: 'ai-infra', title: 'AI Infra 工程师', pathIds: ['mlops', 'distributed', 'cloud'], professionalRoleId: 'cloud-engineer', focus: '训练与推理平台、分布式系统、加速与资源调度' },
+      { id: 'ai-application', title: 'AI 应用工程师', pathIds: ['agent', 'nlp'], professionalRoleId: 'ai-application-engineer', focus: '智能体、RAG、工具调用、评测与服务工程' },
+      { id: 'ai-model', title: 'AI 模型工程师', pathIds: ['pretrain', 'posttrain', 'dl'], professionalRoleId: 'ml-engineer', focus: '预训练、后训练、模型评测与推理优化' },
+      { id: 'ai-security', title: 'AI 安全与隐私工程师', pathIds: ['security', 'ml'], professionalRoleId: 'security-engineer', focus: '模型与数据安全、隐私保护、攻防评测与治理' },
+      { id: 'hardware', title: '硬件技术工程师', pathIds: ['embedded'], focus: '数字电路、板级系统、驱动调试、可靠性与功耗' },
+      { id: 'software', title: '软件开发工程师', pathIds: ['software', 'backend', 'mobile'], professionalRoleId: 'backend-engineer', focus: '基础软件、业务服务、终端应用与工程质量' },
+      { id: 'chip', title: '芯片与器件工程师', pathIds: ['compiler', 'embedded'], focus: '芯片架构、编译工具链、驱动适配与软硬件协同' },
+      { id: 'data-science', title: '数据科学工程师', pathIds: ['data', 'dataeng'], professionalRoleId: 'data-engineer', focus: '数据治理、特征工程、指标体系与分析建模' },
+      { id: 'algorithm', title: '算法工程师', pathIds: ['algorithm', 'cv', 'recsys'], professionalRoleId: 'algorithm-engineer', focus: '算法设计、复杂度、视觉与搜索推荐建模' },
+      { id: 'network-security', title: '网络安全与隐私工程师', pathIds: ['security', 'network'], professionalRoleId: 'security-engineer', focus: '网络协议、安全架构、漏洞治理与数据合规' },
+      { id: 'cloud-service', title: '云服务开发工程师', pathIds: ['cloud', 'ops', 'distributed'], professionalRoleId: 'cloud-engineer', focus: '云原生平台、可靠性、可观测性与多租户隔离' },
+      { id: 'network-research', title: '网络技术研究工程师', pathIds: ['network', 'distributed'], professionalRoleId: 'sre-engineer', focus: '网络协议、性能建模、分布式通信与系统研究' },
+      { id: 'automation-control', title: '自动化控制工程师', pathIds: ['robotics', 'embedded'], professionalRoleId: 'robot-control-engineer', focus: '运动控制、实时系统、传感器执行器与系统联调' },
+      { id: 'intelligent-driving', title: '智能驾驶算法工程师', pathIds: ['driving', 'cv'], professionalRoleId: 'driving-planning-engineer', focus: '感知融合、定位、预测规划控制与仿真验证' }
+    ]
+  }
 );
 export const rolePrep = [
   {

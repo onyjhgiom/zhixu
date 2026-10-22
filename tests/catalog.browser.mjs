@@ -19,7 +19,7 @@ async function navigate(hash) {
   await expect(page.locator('#content h1').first()).toBeVisible();
 }
 try {
-  for (const company of companies.filter(item => ['meituan', 'zhipu', 'jd', 'baidu', 'mihoyo', 'netease'].includes(item.id))) {
+  for (const company of companies.filter(item => ['meituan', 'zhipu', 'jd', 'baidu', 'mihoyo', 'netease', 'huawei'].includes(item.id))) {
     for (const role of ['robotics', 'driving']) {
       await navigate(`interviews?role=${role}&company=${company.id}`);
       await expect(page.locator('.company-focus h3')).toContainText(company.title);
@@ -27,6 +27,11 @@ try {
       await expect(page.locator('.company-pill')).toHaveCount(companies.length + 1);
       await expect(page.locator('.question-card')).toHaveCount(4);
       await expect(page.locator('.company-focus a')).toHaveAttribute('href', company.url);
+      if (company.id === 'huawei') {
+        await expect(page.locator('.company-role-card')).toHaveCount(14);
+        await expect(page.locator('.company-role-card.active')).toHaveCount(1);
+        await expect(page.locator('[data-company-role="intelligent-driving"]')).toContainText('智能驾驶算法工程师');
+      }
       await page.getByRole('link', { name: '面经与我的复盘', exact: true }).click();
       await expect(page.locator('.experience-source h3')).toContainText(company.title);
       await page.locator('[name="note"]').fill(company.title + ' · ' + role + ' 独立复盘');
@@ -42,19 +47,22 @@ try {
   for (const theme of ['light', 'dark']) for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 960 });
     await page.evaluate(value => document.documentElement.dataset.theme = value, theme);
-    for (const route of ['interviews?role=driving&company=baidu', 'interviews?role=robotics&company=meituan&tab=experience', 'growth?direction=embodied', 'growth?direction=driving', 'role?role=vehicle-algorithm-test-engineer', 'projects?role=driving', 'resources']) {
+    for (const route of ['interviews?role=driving&company=baidu', 'interviews?role=driving&company=huawei', 'interviews?role=robotics&company=meituan&tab=experience', 'growth?direction=embodied', 'growth?direction=driving', 'role?role=vehicle-algorithm-test-engineer', 'projects?role=driving', 'resources']) {
       await navigate(route);
       if (route === 'resources') await page.locator('#resource-path').selectOption('driving');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${route} ${width} ${theme}`);
-      if ([1440, 390].includes(width) && ['growth?direction=embodied', 'growth?direction=driving', 'interviews?role=driving&company=baidu'].includes(route)) await page.screenshot({ path: `artifacts/catalog-${route.split('?')[0]}-${route.includes('embodied') ? 'embodied' : 'driving'}-${theme}-${width}.png`, fullPage: true });
+      if ([1440, 390].includes(width) && ['growth?direction=embodied', 'growth?direction=driving', 'interviews?role=driving&company=baidu', 'interviews?role=driving&company=huawei'].includes(route)) await page.screenshot({ path: `artifacts/catalog-${route.split('?')[0]}-${route.includes('embodied') ? 'embodied' : route.includes('huawei') ? 'huawei' : 'driving'}-${theme}-${width}.png`, fullPage: true });
     }
   }
   await navigate('search?q=' + encodeURIComponent('智谱'));
   await expect(page.locator('.company-card')).toHaveCount(1);
+  await navigate('search?q=' + encodeURIComponent('芯片与器件工程师'));
+  await expect(page.locator('.company-card')).toHaveCount(1);
+  await expect(page.locator('.company-card')).toContainText('华为');
   await navigate('search?q=' + encodeURIComponent('具身智能'));
   await expect(page.locator('.path-card')).toHaveCount(1);
   await navigate('search?q=' + encodeURIComponent('智能驾驶'));
   assert.ok(await page.locator('.path-card').count() >= 1);
   assert.deepEqual(errors, []);
-  console.log('Catalogue browser checks passed: 12 company/direction combinations, independent notes, 16 specialist roles, search and 42 responsive states.');
+  console.log('Catalogue browser checks passed: 14 company/direction combinations, Huawei role families, independent notes, 16 specialist roles, search and 48 responsive states.');
 } finally { await browser.close(); }

@@ -1,5 +1,9 @@
 # 网站内容来源与核验
 
+## 2026-10-23 华为岗位映射补充
+
+华为招聘官网 `https://career.huawei.com/reccampportal/portal5/index.html` 本次返回 HTTP 200。官网公开招聘类别包含 AI Infra、AI 应用、AI 模型、AI 安全与隐私、硬件技术、软件开发、芯片与器件、数据科学、算法、网络安全与隐私、云服务开发、网络技术研究、自动化控制、智能驾驶算法等研发方向。本站将这些类别映射到既有学习路线和专业能力标准，不表示某一岗位当前仍开放；实际团队、地点、招聘类型、职责和技术栈以官网实时 JD 为准。
+
 ## 2026-10-22 公司与具身智能、智能驾驶扩充
 
 本次只新增官方入口、原创准备内容与开源学习索引。新增公司没有虚构面经摘要；每个公司与方向提供牛客检索入口。技术课程按 ROS 2、Apollo、Autoware、CARLA 的公开模块和仿真边界组织，不代表任何公司当前在招岗位。
@@ -12,6 +16,7 @@
 | 百度 `https://talent.baidu.com/` | HTTP 200，跳转官方职位页面 |
 | 米哈游 `https://jobs.mihoyo.com/` | HTTP 200，标题「miHoYo招聘官网」 |
 | 网易 `https://hr.163.com/` | HTTP 200，标题「网易社会招聘」 |
+| 华为 `https://career.huawei.com/reccampportal/portal5/index.html` | 2026-10-23 HTTP 200；岗位类别按官方招聘页整理 |
 | ROS 2 `https://docs.ros.org/en/jazzy/Tutorials.html` | HTTP 200，官方英文文档 |
 | Apollo `https://apollo.baidu.com/docs/apollo/latest/index.html` | HTTP 200；模块架构与感知、规划资料可检索 |
 | Apollo 开发实践 `https://apollo.baidu.com/community` | 官方中文社区；本机复查超时，旧的无效 README 路径已移除 |

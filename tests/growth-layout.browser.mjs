@@ -3,17 +3,13 @@ import assert from 'node:assert/strict';
 import { access, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
+import { professionalDirections, professionalRoles } from '../professional-data.js';
 
 const base = (process.env.TEST_BASE_URL || 'http://127.0.0.1:4173').replace(/\/+$/, '');
 const artifacts = new URL('../artifacts/', import.meta.url);
 const uiFile = new URL('../growth-ui.js', import.meta.url);
-const directions = ['frontend', 'backend', 'algorithm', 'data', 'systems', 'ai', 'security', 'testing'];
-const roles = [
-  'frontend-engineer', 'backend-engineer', 'fullstack-engineer', 'algorithm-engineer',
-  'recommendation-engineer', 'data-analyst', 'data-engineer', 'sre-engineer',
-  'cloud-engineer', 'database-engineer', 'ai-application-engineer', 'ml-engineer',
-  'security-engineer', 'test-development-engineer'
-];
+const directions = professionalDirections.map(item => item.id);
+const roles = professionalRoles.map(item => item.id);
 const routes = [
   ...directions.map(id => 'growth?direction=' + id),
   ...roles.map(id => 'role?role=' + id),
@@ -21,6 +17,8 @@ const routes = [
 ];
 const captures = new Map([
   ['growth?direction=frontend', 'direction'],
+  ['growth?direction=game', 'game-direction'],
+  ['role?role=game-client-engineer', 'game-role'],
   ['role?role=backend-engineer', 'role'],
   ['assessment', 'assessment'],
   ['plan', 'plan']

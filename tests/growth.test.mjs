@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { professionalRoles, professionalSkills } from '../professional-data.js';
+import { professionalDirections, professionalRoles, professionalSkills } from '../professional-data.js';
 import { assessmentQuestions, sanitizeGrowthState, getSkillEvidence, diagnoseRole, buildLearningPlan } from '../growth-core.js';
 
 const role = professionalRoles.find(item => item.id === 'frontend-engineer');
@@ -15,7 +15,8 @@ test('diagnostic bank covers all directions, references real skills and has vali
     assert.equal(item.options.length, 4); assert.ok(item.answer >= 0 && item.answer < 4);
     assert.ok(item.explanation.length > 15); assert.ok(item.level <= 2);
   }
-  assert.equal(assessmentQuestions.length, 24);
+  for (const direction of professionalDirections) assert.equal(assessmentQuestions.filter(item => item.directionId === direction.id).length, 3, direction.id);
+  assert.equal(assessmentQuestions.length, 27);
 });
 
 test('unknown skills remain unknown, including when all self ratings are high', () => {
@@ -102,6 +103,30 @@ test('diagnostic evidence maps to the concept actually asked', () => {
   assert.equal(assessmentQuestions.find(item => item.id === 'ai-a').skillId, 'ai-data');
   assert.equal(assessmentQuestions.find(item => item.id === 'security-a').skillId, 'security-auth');
   assert.equal(assessmentQuestions.find(item => item.id === 'security-b').skillId, 'security-code');
+});
+
+test('game diagnosis and plans keep their own evidence, prerequisites and persisted progress', () => {
+  const state = empty();
+  const questions = assessmentQuestions.filter(item => item.directionId === 'game');
+  state.answers[questions[0].id] = questions[0].answer;
+  state.answers[questions[1].id] = (questions[1].answer + 1) % 4;
+  const report = diagnoseRole('game-client-engineer', 'campus', state);
+  assert.ok(report.coverage > 0 && report.coverage < 100);
+  assert.ok(report.gaps.some(item => item.skillId === questions[0].skillId && item.currentLevel === 1));
+  assert.ok(report.weaknesses.some(item => item.skillId === questions[1].skillId && item.currentLevel === 0));
+  assert.ok(report.unassessed.some(item => item.skillId === questions[2].skillId));
+  state.plan = buildLearningPlan({ ...configuration, roleId: 'game-client-engineer' }, state);
+  const tasks = state.plan.tasks, skills = tasks.filter(item => item.kind === 'skill').map(item => item.skillIds[0]);
+  for (const id of skills) for (const dependency of professionalSkills.find(item => item.id === id).dependencies) assert.ok(skills.indexOf(dependency) < skills.indexOf(id));
+  assert.ok(tasks.every(item => item.directionId === 'game'));
+  assert.match(tasks.find(item => item.kind === 'project').title, /双人协作/);
+  const taskId = tasks[0].id;
+  state.completed[taskId] = '2026-10-22T09:00:00.000Z';
+  const restored = sanitizeGrowthState(JSON.parse(JSON.stringify(state)));
+  assert.equal(restored.completed[taskId], state.completed[taskId]);
+  assert.deepEqual(restored.answers, state.answers);
+  assert.deepEqual(restored.plan.tasks.map(item => item.id), tasks.map(item => item.id));
+  assert.equal(diagnoseRole('frontend-engineer', 'campus', restored).coverage, 0);
 });
 
 test('changing weekly availability changes scheduling and invalid dates are rejected', () => {

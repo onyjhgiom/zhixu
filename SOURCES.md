@@ -203,3 +203,12 @@
 | 区块链工程 | [FISCO BCOS 中文文档](https://fisco-bcos-documentation.readthedocs.io/zh-cn/latest/) | 中文 | 页面 HTTP 200 |
 | 区块链工程 | [智能合约测试中文指南](https://ethereum.org/zh/developers/docs/smart-contracts/testing/) | 中文 | 待人工复核：网络或配额限制 |
 | AI Infra 与 MLOps | [vLLM 官方推理服务文档](https://docs.vllm.ai/en/latest/) | 英文 | 待人工复核：网络或配额限制 |
+
+## 2026-10-22 游戏开发专业方向补充
+
+新增方向复用既有 Godot/Cocos 资源，并补充以下两个官方入口。此处仅记录本次实际核验的新增链接，不更新上表历史核验结论。
+
+| 资源 | 来源与用途 | 本次核验 |
+| --- | --- | --- |
+| [Unity 固定步更新](https://docs.unity3d.com/Manual/fixed-updates.html) | Unity 官方英文手册；比较固定物理步和渲染更新 | HTTP 200，官网正文已核对 |
+| [Unreal Engine 网络同步概览](https://dev.epicgames.com/documentation/en-us/unreal-engine/networking-overview-for-unreal-engine) | Epic Games 官方英文文档；权威模型、复制与网络模式 | HTTP 200，官网正文已核对 |

@@ -23,7 +23,7 @@ try {
   await page.evaluate(value => { localStorage.setItem('zhixu-learning-v1', JSON.stringify(value)); }, legacy);
   const legacyBefore = await page.evaluate(() => localStorage.getItem('zhixu-learning-v1'));
   await navigate('growth');
-  assert.equal(await page.locator('.growth-direction').count(), 8);
+  assert.equal(await page.locator('.growth-direction').count(), professionalDirections.length);
   for (const direction of professionalDirections) {
     await navigate(`growth?direction=${direction.id}`);
     assert.equal(await page.locator('#content h1').innerText(), direction.title);
@@ -35,7 +35,7 @@ try {
     assert.ok(await page.locator('.growth-resource-reason').count() >= 3);
   }
   await navigate('roles');
-  assert.equal(await page.locator('.growth-role-card').count(), 14);
+  assert.equal(await page.locator('.growth-role-card').count(), professionalRoles.length);
   await page.locator('#growth-role-filter [name=direction]').selectOption('frontend');
   await page.locator('#growth-role-filter button[type=submit]').click();
   await page.waitForURL(/direction=frontend/);
@@ -43,6 +43,8 @@ try {
   for (const job of professionalRoles) {
     await navigate(`role?role=${job.id}`);
     assert.equal(await page.locator('#content h1').innerText(), job.title);
+    const assessmentHref = await page.locator('.growth-header').getByRole('link', { name: '能力测评', exact: true }).getAttribute('href');
+    assert.equal(new URLSearchParams(assessmentHref.split('?')[1]).get('role'), job.id);
     const content = await page.locator('#content').textContent();
     for (const entry of job.jdKeywords) assert.ok(content.includes(entry.keyword));
     for (const entry of job.deliverables) assert.ok(content.includes(entry.title));
@@ -103,7 +105,35 @@ try {
   state = await growthState();
   assert.ok(state.plan.tasks.some(item => item.title.includes('前后端')));
   assert.ok(state.completed[taskId], 'switching roles preserves previous task records');
+  await navigate('growth?direction=game');
+  await page.locator('.growth-header').getByRole('link', { name: '能力测评', exact: true }).click();
+  await page.waitForURL(url => url.hash.startsWith('#assessment?role=game-client-engineer'));
+  await expect(form.locator('[name=roleId]')).toHaveValue('game-client-engineer');
+  assert.ok((await page.locator('.growth-header a').getAttribute('href')).includes('role=game-client-engineer'));
+  const gameQuestions = assessmentQuestions.filter(item => item.directionId === 'game');
+  assert.equal(await form.locator('.growth-quiz').count(), 3);
+  await form.locator(`input[name="answer:${gameQuestions[0].id}"][value="${gameQuestions[0].answer}"]`).check();
+  await form.locator(`input[name="answer:${gameQuestions[1].id}"][value="${(gameQuestions[1].answer + 1) % 4}"]`).check();
+  await form.locator('button[type=submit]').click();
+  await expect(page.locator('.growth-diagnostic-summary')).toBeVisible();
+  state = await growthState();
+  assert.equal(state.profile.roleId, 'game-client-engineer');
+  assert.ok(!Object.hasOwn(state.answers, gameQuestions[2].id));
+  assert.equal(await page.locator('.growth-quiz-explanation').count(), 2);
+  await navigate('plan');
+  assert.ok((await page.locator('#content').textContent()).includes('双人协作闯关与性能优化'));
+  const gameTask = page.locator('[data-growth-complete]').first();
+  const gameTaskId = await gameTask.getAttribute('data-growth-complete');
+  await gameTask.check();
+  await page.reload();
+  await expect(page.locator('[data-growth-complete]').first()).toBeChecked();
+  state = await growthState();
+  assert.ok(state.completed[gameTaskId] && state.completed[taskId]);
+  assert.ok(state.plan.tasks.every(item => item.directionId === 'game'));
   assert.equal(await page.evaluate(() => localStorage.getItem('zhixu-learning-v1')), legacyBefore);
+  await navigate('search?q=' + encodeURIComponent('游戏'));
+  await expect(page.locator('.growth-search-results').getByRole('link', { name: /游戏开发/ })).toBeVisible();
+  await expect(page.locator('.growth-search-results').getByRole('link', { name: /游戏客户端工程师/ })).toBeVisible();
   await navigate('search?q=' + encodeURIComponent('工程师'));
   assert.ok(await page.locator('.growth-search-results').count() > 0);
   await navigate('search?q=' + encodeURIComponent('<img src=x onerror=alert(1)>'));
@@ -124,8 +154,8 @@ try {
   await blockedPage.locator('#growth-assessment-form button[type=submit]').click();
   await expect(blockedPage.locator('.growth-diagnostic-summary')).toBeVisible();
   await blockedPage.goto(`${base}/#growth`);
-  await expect(blockedPage.locator('.growth-direction')).toHaveCount(8);
+  await expect(blockedPage.locator('.growth-direction')).toHaveCount(professionalDirections.length);
   await blocked.close();
   assert.deepEqual(errors, []);
-  console.log('Growth browser checks passed: eight full directions, 14 role profiles, filtering, answers/self-assessment, unknowns, dated planning, completion/reload/regeneration, exports, cross-role projects, legacy data preservation, search, dialog links, mobile layout and restricted storage.');
+  console.log('Growth browser checks passed: all directions and roles, game assessment/diagnosis/planning/persistence/search, filtering, answers/self-assessment, unknowns, dated planning, completion/reload/regeneration, exports, cross-role projects, legacy data preservation, dialog links, mobile layout and restricted storage.');
 } finally { await context.close(); await browser.close(); }

@@ -15,7 +15,7 @@ const nonempty = value => typeof value === 'string' && value.trim().length > 0;
 
 test('professional catalogue preserves existing paths and distinguishes unknown from level zero',()=>{
   assert.match(professionalDataVersion,/^\d{4}-\d{2}-\d{2}\.\d+$/);
-  assert.deepEqual([...directionIds],['frontend','backend','algorithm','data','systems','ai','security','testing']);
+  assert.deepEqual([...directionIds],['frontend','backend','algorithm','data','systems','ai','security','testing','game']);
   assert.deepEqual(masteryLevels.map(item => item.level),[0,1,2,3,4]);
   assert.match(masteryLevels[0].description,/null/);
   assert.match(contentPolicy.baseline,/不代表.*官方招聘/);
@@ -50,7 +50,7 @@ test('each direction provides four concrete stages with tasks, evidence and acce
 });
 
 test('skills have unique stable ids, valid stage placement and an acyclic dependency graph',()=>{
-  assert.equal(professionalSkills.length,48);
+  assert.equal(professionalSkills.length,54);
   assert.equal(skillIds.size,professionalSkills.length);
   const byId = new Map(professionalSkills.map(item => [item.id,item]));
   for (const direction of professionalDirections) {

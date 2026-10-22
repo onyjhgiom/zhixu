@@ -27,7 +27,7 @@ try {
   for (const direction of professionalDirections) {
     await navigate(`growth?direction=${direction.id}`);
     assert.equal(await page.locator('#content h1').innerText(), direction.title);
-    assert.equal(await page.locator('.growth-skill').count(), 6);
+    assert.equal(await page.locator('.growth-skill').count(), direction.skills.length);
     const content = await page.locator('#content').textContent();
     for (const stage of direction.stages) assert.ok(content.includes(stage.title));
     assert.ok(content.includes(direction.project.title));

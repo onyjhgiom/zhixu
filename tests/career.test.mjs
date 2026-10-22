@@ -11,8 +11,8 @@ test('every learning direction has substantial resources and both written and in
 });
 test('company and experience references resolve without pretending that editorial exercises are company questions',()=>{
  const companyIds=new Set(companies.map(c=>c.id)),roleIds=new Set(paths.map(p=>p.id));
- assert.equal(companyIds.size,5);
- for(const c of companies){assert.equal(new URL(c.url).protocol,'https:');assert.ok(experiences.some(x=>x.company===c.id));for(const p of paths){const url=new URL(experienceUrl(c,p));assert.equal(url.hostname,'www.nowcoder.com');assert.ok(url.searchParams.get('query').includes(p.title));}}
+ assert.equal(companyIds.size,11);
+ for(const c of companies){assert.equal(new URL(c.url).protocol,'https:');assert.ok(c.scenario && c.prompts.length >= 3);for(const p of paths){const url=new URL(experienceUrl(c,p));assert.equal(url.hostname,'www.nowcoder.com');assert.ok(url.searchParams.get('query').includes(p.title));}}
  for(const x of experiences){assert.ok(companyIds.has(x.company));for(const id of x.roles)assert.ok(roleIds.has(id));assert.equal(new URL(x.url).hostname,'www.nowcoder.com');assert.ok(x.date);}
  for(const q of questions)assert.equal(q.origin,'站内原创练习');
 });

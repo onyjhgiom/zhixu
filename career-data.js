@@ -1,4 +1,5 @@
 import { paths } from './data.js';
+import { mobilityPrep } from './mobility-data.js';
 // 公司场景与准备重点为站内编辑建议，不代表官方考题、招聘承诺或固定面试流程。
 export const companies = [
   {
@@ -107,6 +108,14 @@ export const companies = [
     ]
   }
 ];
+companies.push(
+  { id: 'meituan', title: '美团', en: 'Meituan', mark: '美', color: '#a27d0a', url: 'https://zhaopin.meituan.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '本地生活与即时履约', scenario: '以配送调度、本地生活交易或无人配送系统为练习背景', prompts: ['讨论订单履约、调度优化和高峰稳定性', '区分无人配送的感知定位、规划控制与平台职责', '用固定场景和容量数据说明方案取舍'], keywords: ['美团', 'Meituan', '外卖', '配送'] },
+  { id: 'zhipu', title: '智谱', en: 'Z.ai · Zhipu AI', mark: '智', color: '#5478b2', url: 'https://www.zhipuai.cn/zh/joinus', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '通用模型与智能体应用', scenario: '以模型训练、推理服务、多模态或智能体应用为练习背景', prompts: ['准备数据质量、训练评估和推理成本分析', '区分模型能力与应用工具链的职责', '保留可复现实验、评测集和失败案例'], keywords: ['智谱', 'Zhipu', 'GLM', 'Z.ai'] },
+  { id: 'jd', title: '京东', en: 'JD.com', mark: '京', color: '#b74448', url: 'https://zhaopin.jd.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '零售供应链与物流技术', scenario: '以零售交易、仓储履约、配送或机器人系统为练习背景', prompts: ['围绕库存、订单和物流链路讨论一致性', '解释仓储机器人数据、调度与系统接口', '准备并发容量、异常恢复和工程交付证据'], keywords: ['京东', 'JD', '物流', '供应链'] },
+  { id: 'baidu', title: '百度', en: 'Baidu', mark: '百', color: '#4366b4', url: 'https://talent.baidu.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '搜索、模型与智能驾驶', scenario: '以搜索服务、模型应用或 Apollo 驾驶仿真为练习背景', prompts: ['区分搜索检索排序、模型服务与驾驶算法', '准备感知融合、规划控制或车载测试的具体证据', '解释数据闭环、场景覆盖和版本回归'], keywords: ['百度', 'Baidu', 'Apollo', '智能驾驶', '文心'] },
+  { id: 'mihoyo', title: '米哈游', en: 'miHoYo', mark: '米', color: '#2a8795', url: 'https://jobs.mihoyo.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '游戏技术与互动内容', scenario: '以游戏客户端、引擎渲染、服务端或技术工具为练习背景', prompts: ['讲清帧循环、资源生命周期和性能分析', '准备渲染、网络同步或自动化质量的独立项目', '说明美术协作、工具效率和跨平台边界'], keywords: ['米哈游', 'miHoYo', '游戏', '原神', '星穹铁道'] },
+  { id: 'netease', title: '网易', en: 'NetEase', mark: '网', color: '#a2505d', url: 'https://hr.163.com/', linkLabel: '官方招聘', verifiedAt: '2026-10-22', theme: '游戏、内容与互联网服务', scenario: '以在线游戏、内容产品、音视频或高并发服务为练习背景', prompts: ['准备客户端、游戏服务端或内容推荐的工程证据', '讨论多人状态、质量保障与线上稳定性', '用指标与失败复盘说明业务和技术取舍'], keywords: ['网易', 'NetEase', '游戏', '云音乐', '有道'] }
+);
 export const rolePrep = [
   {
     "id": "agent",
@@ -1672,6 +1681,10 @@ rolePrep.push(...[
     ]
   }
 ]);
+for (const prep of mobilityPrep) {
+  const index = rolePrep.findIndex(item => item.id === prep.id);
+  if (index >= 0) rolePrep[index] = prep; else rolePrep.push(prep);
+}
 const preparedRoleIds = new Set(rolePrep.map(item=>item.id));
 for (const path of paths) {
   if (preparedRoleIds.has(path.id)) continue;

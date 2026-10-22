@@ -1,4 +1,5 @@
 import { matchesQuery } from './core.js';
+import { mobilityProjects } from './mobility-data.js';
 
 // Region describes the public initiating institution, not a hiring or on-site location.
 // Repository URLs and the four institution profiles were checked on 2026-10-19.
@@ -661,6 +662,8 @@ export function repositoryUrl(value) {
     return url.href;
   } catch { return null; }
 }
+
+projects.push(...mobilityProjects);
 
 export function parseProjectFilters(hash, roles) {
   const params = new URLSearchParams(hash.split('?')[1] || '');

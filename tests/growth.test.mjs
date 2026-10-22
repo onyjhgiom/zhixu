@@ -16,7 +16,7 @@ test('diagnostic bank covers all directions, references real skills and has vali
     assert.ok(item.explanation.length > 15); assert.ok(item.level <= 2);
   }
   for (const direction of professionalDirections) assert.equal(assessmentQuestions.filter(item => item.directionId === direction.id).length, 3, direction.id);
-  assert.equal(assessmentQuestions.length, 27);
+  assert.equal(assessmentQuestions.length, 33);
 });
 
 test('unknown skills remain unknown, including when all self ratings are high', () => {

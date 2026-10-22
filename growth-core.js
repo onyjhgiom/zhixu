@@ -1,4 +1,5 @@
 import { professionalDirections, professionalRoles, professionalSkills, professionalDataVersion } from './professional-data.js';
+import { mobilityAssessment } from './mobility-data.js';
 
 // Diagnostic questions establish a narrow knowledge signal, not production experience.
 const question = (directionId, suffix, skillId, title, options, answer, explanation, level = 2) => ({ id: `${directionId}-${suffix}`, directionId, skillId, title, options, answer, explanation, level });
@@ -32,6 +33,7 @@ export const assessmentQuestions = [
   question('game', 'c', 'game-network', '多人战斗中，客户端应该向服务端发送哪类信息？', ['带序号的动作请求，由服务端校验并权威结算伤害', '任意修改后的最终分数', '本地计算的生命值，要求服务端无条件覆盖', '其他玩家的完整登录凭据'], 0, '客户端发送动作意图和序号，服务端检查身份、规则、时序和去重，再广播权威状态；预测或插值用于表现，不能替代服务端校验。')
 ];
 
+assessmentQuestions.push(...mobilityAssessment);
 const roleById = id => professionalRoles.find(role => role.id === id);
 const skillById = id => professionalSkills.find(skill => skill.id === id);
 const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;

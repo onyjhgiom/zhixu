@@ -4,7 +4,7 @@ import { paths, categories, resources } from '../data.js';
 import { projects } from '../project-data.js';
 import { rolePrep } from '../career-data.js';
 
-const addedIds = ['nlp', 'recsys', 'mobile', 'game', 'graphics', 'mlops', 'network', 'robotics', 'compiler', 'blockchain'];
+const addedIds = ['nlp', 'recsys', 'mobile', 'game', 'graphics', 'mlops', 'network', 'robotics', 'driving', 'compiler', 'blockchain'];
 test('additional directions retain their domain curriculum and connect learning, interviews and projects', () => {
   const categoryIds = new Set(categories.map(x => x.id));
   for (const id of addedIds) {

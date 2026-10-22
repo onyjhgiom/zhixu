@@ -1,5 +1,30 @@
 # 网站内容来源与核验
 
+## 2026-10-22 公司与具身智能、智能驾驶扩充
+
+本次只新增官方入口、原创准备内容与开源学习索引。新增公司没有虚构面经摘要；每个公司与方向提供牛客检索入口。技术课程按 ROS 2、Apollo、Autoware、CARLA 的公开模块和仿真边界组织，不代表任何公司当前在招岗位。
+
+| 官方入口 | 本次结果 |
+| --- | --- |
+| 美团 `https://zhaopin.meituan.com/` | 招聘域名已检索；本机两次请求超时，未记为 HTTP 200 |
+| 智谱 `https://www.zhipuai.cn/zh/joinus` | HTTP 200，页面含校园与社会招聘入口 |
+| 京东 `https://zhaopin.jd.com/` | HTTP 200，标题「京东招聘-首页」 |
+| 百度 `https://talent.baidu.com/` | HTTP 200，跳转官方职位页面 |
+| 米哈游 `https://jobs.mihoyo.com/` | HTTP 200，标题「miHoYo招聘官网」 |
+| 网易 `https://hr.163.com/` | HTTP 200，标题「网易社会招聘」 |
+| ROS 2 `https://docs.ros.org/en/jazzy/Tutorials.html` | HTTP 200，官方英文文档 |
+| Apollo `https://apollo.baidu.com/docs/apollo/latest/index.html` | HTTP 200；模块架构与感知、规划资料可检索 |
+| Apollo 开发实践 `https://apollo.baidu.com/community` | 官方中文社区；本机复查超时，旧的无效 README 路径已移除 |
+| Paddle3D `https://github.com/PaddlePaddle/Paddle3D` | HTTP 200；中文说明与原始开源资料 |
+| UniLidar `https://github.com/unitreerobotics/unilidar_sdk` | HTTP 200；以仓库中中英文说明为准 |
+| SLAM `https://github.com/gaoxiang12/slambook2` | HTTP 200，原作者开源练习 |
+| Easy RL `https://github.com/datawhalechina/easy-rl` | HTTP 200，中文强化学习教程 |
+| Autoware `https://autowarefoundation.github.io/autoware-documentation/main/` | HTTP 200，官方英文架构与仿真文档 |
+| CARLA `https://carla.readthedocs.io/en/latest/` | HTTP 200，官方英文教程 |
+| LeRobot `https://github.com/huggingface/lerobot` | 官方项目入口；本机复查超时，旧的无效中文 README 路径已移除，标为英文 |
+
+以下为之前各次内容核验记录，保留各自日期和结果。
+
 公司与面经核验日期：2026-10-16；新增中文资料核验日期：2026-10-17。以下 HTTP 结果只反映本次访问，不保证之后可用。面经是用户自述，不能独立证明其面试经过。本站仅编写简短摘要和阅读建议，不搬运完整正文。
 
 ## 公司入口

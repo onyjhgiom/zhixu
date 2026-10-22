@@ -1,5 +1,7 @@
+import { mobilityDirections, mobilityRoles } from './mobility-data.js';
+
 // Editorial learning baselines. Benchmarks below apply only to their stated lab.
-export const professionalDataVersion = '2026-10-22.2';
+export const professionalDataVersion = '2026-10-22.3';
 export const contentPolicy = {
   baseline: '以下路线、岗位能力与 JD 词义均为知序编辑能力基线，供校招与社招准备参考，不代表任何公司的官方招聘要求、固定题库或录用承诺。具体岗位以当期官方 JD 为准。',
   measurement: '项目数值是明确实验环境下的练习验收目标。记录硬件、版本、数据规模、并发和测量方法后再比较；不得把本地结果描述为线上生产业绩。',
@@ -318,6 +320,8 @@ const roleProjects = {
 };
 for (const item of professionalRoles) if (roleProjects[item.id]) item.project = roleProjects[item.id];
 
+professionalDirections.push(...mobilityDirections);
+professionalRoles.push(...mobilityRoles);
 export const professionalSkills = professionalDirections.flatMap(direction => direction.skills.map(item => ({...item,directionId:direction.id})));
 export function getProfessionalDirection(idOrPathId) {
   return professionalDirections.find(direction => direction.id === idOrPathId) || professionalDirections.find(direction => direction.pathIds.includes(idOrPathId));

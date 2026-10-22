@@ -40,7 +40,7 @@ try {
   await page.locator('#content [data-save="mdn"]').click();assert.equal(await page.locator('#content [data-save="mdn"]').getAttribute('aria-pressed'),'true');
   await page.locator('[data-action="saved"]').click();assert.equal(await page.locator('#content .resource-row').count(),1);
   await page.reload();assert.equal(await page.locator('#content .resource-row').count(),1);
-  await page.locator('#search-input').fill('agent');await page.locator('#search-input').press('Enter');await page.waitForURL('**/#search?q=agent');assert.ok(await page.locator('.path-card').count()>0);
+  await page.locator('#search-input').fill('agent');await page.locator('#search-input').press('Enter');await page.waitForURL('**/#search?q=agent');await expect(page.locator('.path-card').first()).toBeVisible();
   await page.locator('#search-input').fill('<img src=x onerror=alert(1)>');await page.locator('#search-input').press('Enter');await page.waitForURL(/search\?q=%3C/);assert.equal(await page.locator('#content img').count(),0);
 
   await navigate('interviews');assert.equal(await page.locator('.question-card').count(),4);

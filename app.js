@@ -1,12 +1,15 @@
 import { createCareer } from './career-ui.js';
 import { createProjects } from './project-ui.js';
 import { createGrowth } from './growth-ui.js';
+import { createResume } from './resume-ui.js';
 import { paths, categories, resources, examTopics, examLinks, helpServices } from './data.js';
 import { escapeHtml as e, matchesQuery, progressFor, sanitizeState, buildExamPlan } from './core.js';
 let disposeHomeMotion = () => {};
 let disposeFluidMotion = () => {};
 let fluidSystem;
 const icons = {
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  upload:'<path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/>',
   pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
   compass:'<circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z"/>',
@@ -50,7 +53,8 @@ let activeCategory = 'all', resourcePath = 'all', resourceLanguage = 'all', reso
 let lastFocus, toastTimer;
 const dialog = document.getElementById('detail-dialog');
 const content = document.getElementById('content');
-const career=createCareer({paths,resources,resourceRow,icon,e,toast,go,closeDialog,exportFile});
+const resume=createResume({paths,icon,e,toast,render});
+const career=createCareer({paths,resources,resourceRow,icon,e,toast,go,closeDialog,exportFile,resume});
 const projectLab=createProjects({paths,icon,e,closeDialog});
 const growth=createGrowth({e,icon,toast,go,render,resourceRow,exportFile,closeDialog});
 const titles = {growth:'专业学习方向',roles:'岗位能力地图',role:'岗位能力详情',assessment:'能力测评与诊断',plan:'个性化成长计划',workspace:'我的学习空间',projects:'项目实践',interviews:'求职面试',home:'学习概览',tech:'技术成长',roadmaps:'学习路线',resources:'资料库',exam:'考研升学',support:'考研帮扶',learning:'我的学习',saved:'我的收藏',search:'搜索结果'};

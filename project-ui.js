@@ -1,4 +1,5 @@
 import { projects, projectRegions, repositoryUrl, parseProjectFilters, projectHash, filterProjects } from './project-data.js';
+import { mountProjectVideos } from './video-ui.js';
 
 export function createProjects({ paths, icon, e, closeDialog }) {
   const roleById = new Map(paths.map(p => [p.id, p]));
@@ -66,6 +67,7 @@ export function createProjects({ paths, icon, e, closeDialog }) {
     root.querySelector('.project-reset').disabled = s.role === 'all' && s.region === 'all' && !s.q.trim();
     root.querySelector('#project-empty').hidden = visible.size > 0;
     root.querySelector('#project-result-count').textContent = summary(s, visible.size);
+    mountProjectVideos(root, s.role);
   }
 
   function preview(role) {

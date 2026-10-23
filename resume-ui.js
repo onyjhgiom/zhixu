@@ -10,8 +10,9 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
   let storageAvailable = true;
   let photoJob = 0;
   let exporting = false;
-  let pendingRegenerate = false;
+  let pendingAction = '';
   let generating = false;
+  let generatingIntent = 'generate';
   let generationError = '';
   let generationController;
   let models = [{ id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6' }], modelsStatus = 'idle';
@@ -178,7 +179,7 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
   }
   function previewPanel() {
     const generated = !!state.document;
-    return `<aside class="resume-preview-panel"><div class="resume-preview-toolbar"><div><h3>简历预览</h3><small>${exporting ? '正在导出…' : generated ? 'A4 排版 · 长内容自动分页导出' : '尚未生成'}</small></div>${generated ? `<div class="resume-export-actions"><button type="button" class="btn btn-secondary" data-resume-export="pdf" ${exporting || generating ? 'disabled' : ''}>${icon('download')}PDF</button><button type="button" class="btn btn-secondary" data-resume-export="png" title="单页下载 PNG，多页 PNG 打包为 ZIP 下载" ${exporting || generating ? 'disabled' : ''}>${icon('download')}PNG 图片</button></div>` : ''}</div><p class="resume-stale" ${state.documentStale && generated ? '' : 'hidden'}>表单已修改，预览仍为上次生成的版本。重新生成后将使用最新表单。</p>${previewDocument(state.document)}${analysisMarkup()}</aside>`;
+    return `<aside class="resume-preview-panel"><div class="resume-preview-toolbar"><div><h3>简历预览</h3><small>${exporting ? '正在导出…' : generated ? 'A4 排版 · 长内容自动分页导出' : '尚未生成'}</small></div>${generated || state.step === 4 ? `<div class="resume-export-actions">${state.step === 4 ? `<button type="button" class="btn btn-secondary" data-resume-polish title="根据当前填写内容与目标 JD / HC 润色简历" ${exporting || generating ? 'disabled' : ''}>${icon('spark')}AI 润色</button>` : ''}${generated ? `<button type="button" class="btn btn-secondary" data-resume-export="pdf" ${exporting || generating ? 'disabled' : ''}>${icon('download')}PDF</button><button type="button" class="btn btn-secondary" data-resume-export="png" title="单页下载 PNG，多页 PNG 打包为 ZIP 下载" ${exporting || generating ? 'disabled' : ''}>${icon('download')}PNG 图片</button>` : ''}</div>` : ''}</div><p class="resume-stale" ${state.documentStale && generated ? '' : 'hidden'}>表单已修改，预览仍为上次生成的版本。重新生成后将使用最新表单。</p>${previewDocument(state.document)}${analysisMarkup()}</aside>`;
   }
   function aiOptions() {
     const selected = state.aiModel || '';
@@ -190,8 +191,8 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
     if (state.step === 1) return educationStep();
     if (state.step === 2) return experienceStep();
     if (state.step === 3) return targetStep();
-    if (generating) return `<div class="resume-generating" role="status" aria-live="polite">${icon('clock')}<div><h3>AI 正在优化简历</h3><p>正在分析岗位需求、梳理经历与核对事实，请稍候。</p><small>${esc(state.aiModel || defaultModel)}</small></div></div><button type="button" class="btn btn-secondary" data-resume-cancel-ai>取消生成</button>`;
-    if (pendingRegenerate) return `<div class="resume-local-note" role="alert"><h3>重新生成简历？</h3><p>预览中的在线编辑将被最新表单内容替换。</p><div class="resume-main-actions"><button type="button" class="btn btn-primary" data-resume-generate>确认重新生成</button><button type="button" class="btn btn-secondary" data-resume-cancel-generate>保留当前编辑</button></div></div>`;
+    if (generating) return `<div class="resume-generating" role="status" aria-live="polite">${icon('clock')}<div><h3>${generatingIntent === 'polish' ? 'AI 正在润色简历' : 'AI 正在优化简历'}</h3><p>正在分析岗位需求、梳理经历与核对事实，请稍候。</p><small>${esc(state.aiModel || defaultModel)}</small></div></div><button type="button" class="btn btn-secondary" data-resume-cancel-ai>取消${generatingIntent === 'polish' ? '润色' : '生成'}</button>`;
+    if (pendingAction) return `<div class="resume-local-note" role="alert"><h3>${pendingAction === 'polish' ? '用 AI 润色当前简历？' : '重新生成简历？'}</h3><p>${pendingAction === 'polish' ? 'AI 将基于当前填写内容与目标 JD / HC 重新整理预览，在线编辑内容会被替换。' : '预览中的在线编辑将被最新表单内容替换。'}</p><div class="resume-main-actions"><button type="button" class="btn btn-primary" data-resume-confirm-action="${pendingAction}">确认${pendingAction === 'polish' ? ' AI 润色' : '重新生成'}</button><button type="button" class="btn btn-secondary" data-resume-cancel-generate>保留当前编辑</button></div></div>`;
     return `<div class="resume-section-head"><div><h3>生成与预览</h3><p>确认你的目标岗位与经历。</p></div></div><div class="resume-target-context">${esc(state.target.roleTitle || currentRole()?.title || '未选择岗位')}${state.target.company ? ` · ${esc(state.target.company)}` : ''} · ${state.target.mode === 'social' ? '社招' : '校招'}</div>${templatePicker()}${aiOptions()}<div class="resume-main-actions">${state.useAI ? `<button type="button" class="btn btn-primary" data-resume-quick-local>${icon('file')}本地生成预览</button>` : ''}<button type="button" class="btn ${state.useAI ? 'btn-secondary' : 'btn-primary'}" data-resume-generate>${icon('spark')}${state.document ? '重新生成预览' : state.useAI ? 'AI 生成简历预览' : '生成简历预览'}</button><button type="button" class="btn btn-secondary" data-resume-step="3">返回修改目标 JD / HC</button></div>${generationError ? `<div class="resume-ai-error" role="alert"><p>${esc(generationError)}</p><button type="button" class="btn btn-secondary" data-resume-local>使用本地排版</button></div>` : ''}<p class="resume-feedback" data-resume-feedback></p>`;
   }
   function page({ roleId = '', companyId = '' } = {}) {
@@ -240,32 +241,32 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
     }
     state.step = destination; persist(true); render();
   }
-  async function generate() {
+  async function generate({ intent = 'generate', confirmed = false } = {}) {
     if (generating) return;
     for (let step = 0; step < 4; step++) {
       const errors = validationErrors(step);
       if (errors.length) { toast(errors[0]); state.step = step; persist(true); render(); return; }
     }
-    if (state.documentEdited && !pendingRegenerate) { pendingRegenerate = true; render(); return; }
-    generationError = ''; pendingRegenerate = false;
-    if (!state.useAI) {
+    if (state.documentEdited && !confirmed) { pendingAction = intent; render(); return; }
+    generationError = ''; pendingAction = '';
+    if (intent !== 'polish' && !state.useAI) {
       try { state.document = buildResumeDocument(state, { optimize: !!state.optimize }); state.generation = null; state.documentEdited = false; state.documentStale = false; persist(); render(); toast('本地简历预览已生成。'); }
       catch { toast('简历生成失败，请检查表单内容后重试。'); }
       return;
     }
     const snapshot = sanitizeResumeState(state);
-    generating = true; generationController = new AbortController(); render();
+    generating = true; generatingIntent = intent; generationController = new AbortController(); render();
     try {
       const response = await fetch('./api/resume/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.any([generationController.signal, AbortSignal.timeout(165000)]), body: JSON.stringify({ ...createResumeAIRequest(snapshot), model: snapshot.aiModel || defaultModel }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error?.message || 'AI 生成暂不可用，请重试或使用本地排版。');
       const generated = applyResumeAIPlan(snapshot, result);
       state.document = generated.document; state.generation = generated.generation; state.documentEdited = false; state.documentStale = false; persist();
-      toast('AI 简历已生成，可在线编辑和导出。');
+      toast(intent === 'polish' ? 'AI 已润色简历内容，可继续在线编辑和导出。' : 'AI 简历已生成，可在线编辑和导出。');
     } catch (error) {
-      generationError = generationController.signal.aborted ? '已取消 AI 生成，当前预览已保留。' : error.name === 'TimeoutError' ? 'AI 生成超时，请重试或使用本地排版。' : error.name === 'TypeError' ? '暂时无法连接 AI 服务，请重试或使用本地排版。' : error.message;
+      generationError = generationController.signal.aborted ? `已取消 AI ${intent === 'polish' ? '润色' : '生成'}，当前预览已保留。` : error.name === 'TimeoutError' ? 'AI 生成超时，请重试或使用本地排版。' : error.name === 'TypeError' ? '暂时无法连接 AI 服务，请重试或使用本地排版。' : error.message;
       toast(generationError);
-    } finally { generating = false; generationController = null; render(); }
+    } finally { generating = false; generatingIntent = 'generate'; generationController = null; render(); }
   }
   async function exportDocument(format) {
     if (!state.document || exporting) return;
@@ -304,7 +305,9 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
       if (state.document) state.document = { ...state.document, templateId: state.templateId };
       persist(); render(); return;
     }
-    if (event.target.closest('[data-resume-local], [data-resume-quick-local]')) { state.useAI = false; pendingRegenerate = false; generate(); return; }
+    if (event.target.closest('[data-resume-local], [data-resume-quick-local]')) { state.useAI = false; pendingAction = ''; generate(); return; }
+    const confirmAction = event.target.closest('[data-resume-confirm-action]');
+    if (confirmAction) { generate({ intent: confirmAction.dataset.resumeConfirmAction, confirmed: true }); return; }
     const step = event.target.closest('[data-resume-step]'); if (step) { updateStep(step.dataset.resumeStep); return; }
     if (event.target.closest('[data-resume-prev]')) { updateStep(state.step - 1, false); return; }
     if (event.target.closest('[data-resume-next]')) { updateStep(state.step + 1); return; }
@@ -312,7 +315,8 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
     const remove = event.target.closest('[data-resume-remove]'); if (remove) { removeEntry(remove.dataset.resumeRemove, remove.dataset.index); return; }
     if (event.target.closest('[data-resume-remove-photo]')) { ++photoJob; state.photo = ''; if (state.document) state.document.photo = ''; persist(); render(); toast('证件照已移除。'); return; }
     if (event.target.closest('[data-resume-generate]')) { generate(); return; }
-    if (event.target.closest('[data-resume-cancel-generate]')) { pendingRegenerate = false; render(); return; }
+    if (event.target.closest('[data-resume-polish]')) { generate({ intent: 'polish' }); return; }
+    if (event.target.closest('[data-resume-cancel-generate]')) { pendingAction = ''; render(); return; }
     const exportButton = event.target.closest('[data-resume-export]'); if (exportButton) exportDocument(exportButton.dataset.resumeExport);
   });
   return { page, getState: () => state };

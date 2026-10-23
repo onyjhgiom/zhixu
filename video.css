@@ -1,0 +1,36 @@
+.video-learning{margin:22px 0 28px;min-width:0;color:var(--ui-text)}
+.video-learning-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.video-learning-heading h2{margin:0;font-size:16px;font-weight:650;letter-spacing:0}
+.video-learning-heading>span{font-size:11px;color:var(--ui-text-3)}
+.video-learning-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.bili-link{display:flex;align-items:center;gap:12px;min-width:0;padding:17px 16px;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface-2);color:var(--ui-text);text-decoration:none;text-align:left;letter-spacing:0;transition:border-color .18s,background .18s}
+.bili-mark{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid color-mix(in srgb,#fb7299 45%,var(--ui-border));border-radius:8px;background:color-mix(in srgb,#fb7299 10%,var(--ui-surface));color:var(--ui-text);font-size:14px;font-weight:700;line-height:1;letter-spacing:0}
+.bili-link-body{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}
+.bili-link-label{font-size:10px;line-height:1.5;color:var(--ui-text-3)}
+.bili-link-body>strong{font-size:12px;line-height:1.65;font-weight:600;overflow-wrap:anywhere;color:var(--ui-text)}
+.bili-link-body>small{font-size:11px;line-height:1.7;color:var(--ui-text-2);overflow-wrap:anywhere}
+.bili-link-action{font-size:10px;color:var(--ui-cyan);white-space:nowrap;flex-shrink:0}
+.bili-link:focus-visible,.video-library>summary:focus-visible{outline:2px solid var(--ui-cyan);outline-offset:4px}
+.bili-link--compact{padding:13px 0;margin:12px 0 0;border:0;border-top:1px solid var(--ui-border);border-radius:0;background:transparent}
+.bili-link--compact .bili-mark{flex-basis:36px;width:36px;height:36px;font-size:12px;border-radius:6px}
+.bili-link--compact .bili-link-action{font-size:10px}
+.path-card>.bili-link{margin-top:8px;margin-bottom:12px}
+.stage-item>.bili-link{grid-column:2/-1}
+.growth-stage>.bili-link{margin:0 22px 18px}
+.growth-skill>.bili-link{margin-top:14px}
+.growth-project>.bili-link,.growth-question-answer>.bili-link{margin-top:20px}
+.subject-video-group{display:flex;flex-direction:column;min-width:0;border:1px solid var(--ui-border);border-radius:8px;background:var(--ui-surface-2);overflow:hidden}
+.subject-video-group>.subject-card{width:100%;flex:1;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.subject-video-group>.bili-link{margin:0 18px;padding:14px 0}
+.support-card>.bili-link{margin:14px 0}
+.video-library{margin:20px 0;border-top:1px solid var(--ui-border);border-bottom:1px solid var(--ui-border);color:var(--ui-text)}
+.video-library>summary{display:flex;align-items:center;gap:12px;padding:17px 0;cursor:pointer;list-style:none}
+.video-library>summary::-webkit-details-marker{display:none}
+.video-library>summary::after{content:'+';margin-left:auto;color:var(--ui-cyan);font-size:22px}
+.video-library[open]>summary::after{content:'−'}
+.video-library>summary>strong{font-size:14px}
+.video-library>summary>span:last-of-type{font-size:11px;color:var(--ui-text-3)}
+.video-source-note{font-size:11px;line-height:1.8;color:var(--ui-text-3);margin-bottom:20px}
+@media(hover:hover){.bili-link:hover{border-color:#fb7299;background:color-mix(in srgb,#fb7299 5%,var(--ui-surface-2))}.bili-link--compact:hover{background:transparent}.bili-link:hover .bili-link-body>strong{text-decoration:underline;text-underline-offset:3px}}
+@media(max-width:680px){.video-learning-heading{align-items:flex-start;flex-direction:column;gap:4px}.bili-link{padding:14px 12px;gap:10px}.bili-link--compact{padding:12px 0}.bili-link-action{font-size:10px}.video-learning-grid{grid-template-columns:minmax(0,1fr)}.video-library>summary{flex-wrap:wrap}.video-library>summary>span:last-of-type{flex-basis:calc(100% - 60px);margin-left:54px}.video-library>summary::after{position:absolute;right:8px}.video-library>summary{position:relative;padding-right:28px}}
+@media(prefers-reduced-motion:reduce){.bili-link{transition:none}}

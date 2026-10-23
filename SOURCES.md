@@ -1,5 +1,36 @@
 # 网站内容来源与核验
 
+## 2026-10-23 B站学习视频入口
+
+全部视频直达 URL 与适用范围保存在 `video-data.js`：按 31 条技术路线、4 门考研课、11 个专业方向、阶段索引、技能 ID 与功能模块绑定。多个相关模块可以引用同一门课程，不表示每个模块都有独立录制的视频。链接不附加未经核实的分集编号，不跳转泛搜索页。标题使用展示简称，范围说明保留课程首讲、旧版工具、经验分享与历史回放等限制。
+
+首先通过 B站原页索引核对标题、BV号、账号、简介和选集目录；部分网页直接抓取返回 HTTP 412，不把索引可检索视为播放成功。另提供 `npm run check:videos` 请求 B站公开视频元数据接口，核对 BV号、原始标题与发布者；这只证明元数据可访问，**不保证实际播放、登录要求、地区限制及之后的下架状态**。浏览器交互测试拦截外部请求，验证目的地、新标签页和 `noopener`，并非播放器测试。
+
+最终目录于 2026-10-23 23:24（Asia/Shanghai）联网复查：51 / 51 条 BV 视频元数据返回 HTTP 200、业务码 0，且 BV号与配置相符；另核对 408 四门课的发布账号均为「王道计算机教育」。功能验收包括 66 项单元测试、35 个路线详情、11 个专业方向、31 类岗位、70 个技能、计划任务、动态筛选、新标签页隔离及手机双主题；简历浏览器回归通过。
+
+| 主题 | 代表视频直达链接 | 核对内容 |
+| --- | --- | --- |
+| 前端 | https://www.bilibili.com/video/BV1RK4y1X7qd/ | 黑马 Web 入门，HTML / CSS / JavaScript |
+| 深度学习 | https://www.bilibili.com/video/BV1zP4y147DS/ | 李宏毅 2021 课程录像，原页含课程与训练实践 |
+| 专题教学 | https://www.bilibili.com/video/BV1KA411N7Px/ | 跟李沐学 AI，自动求导；另按模块绑定训练、LeNet 和 Transformer 视频 |
+| RAG / Agent | https://www.bilibili.com/video/BV1yjz5BLEoY/ | 黑马 RAG 与 Agent 实战 |
+| 预训练 | https://www.bilibili.com/video/BV1dU17YAEJQ/ | Karpathy NanoGPT 课程译制，非原作者账号 |
+| ROS 2 | https://www.bilibili.com/video/BV16B4y1Q7jQ/ | 古月居入门 21 讲 |
+| SLAM | https://www.bilibili.com/video/BV1Hs411k7gi/ | 泡泡机器人发布，高翔基础公开课 |
+| 智能驾驶 | https://www.bilibili.com/video/BV1R64y187su/ | 感知、预测、规划与控制入门 |
+| 算法仿真 | https://www.bilibili.com/video/BV1bJ4m1n7DV/ | CARLA / Autoware 算法接入，不标称 HIL 专项教学 |
+| 408 数据结构 | https://www.bilibili.com/video/BV1b7411N798/ | 王道计算机教育，数据结构课程 |
+| 408 计算机组成原理 | https://www.bilibili.com/video/BV1ps4y1d73V/ | 王道计算机教育，组成原理课程 |
+| 408 操作系统 | https://www.bilibili.com/video/BV1YE411D7nH/ | 王道计算机教育，操作系统课程 |
+| 408 计算机网络 | https://www.bilibili.com/video/BV19E411D78Q/ | 王道计算机教育，计算机网络课程 |
+| 图形学 | https://www.bilibili.com/video/BV1X7411F744/ | GAMES101，GAMES-Webinar 发布 |
+| 推荐系统 | https://www.bilibili.com/video/BV1HZ421U77y/ | 王树森工业推荐公开课 |
+| 云原生 | https://www.bilibili.com/video/BV13Q4y1C7hS/ | 尚硅谷 / KubeSphere，注意工具版本差异 |
+| 简历 | https://www.bilibili.com/video/BV1iA41127Jv/ | 程序员鱼皮案例分享，非完整系统课程 |
+| 择校 | https://www.bilibili.com/video/BV1dAXKYSEds/ | 2026 届历史回放，只参考方法，不作为当前招生数据 |
+
+其余后端、SQL、测试、Git、产品、Spark、Flink、嵌入式、安全、Flutter、Unity、Triton、编译、区块链与考研资源在目录中保留具体 BV URL 与适用范围。未确认的账号认证徽章、完整课程覆盖及播放状态不作为本站保证。
+
 ## 2026-10-23 华为岗位映射补充
 
 华为招聘官网 `https://career.huawei.com/reccampportal/portal5/index.html` 本次返回 HTTP 200。官网公开招聘类别包含 AI Infra、AI 应用、AI 模型、AI 安全与隐私、硬件技术、软件开发、芯片与器件、数据科学、算法、网络安全与隐私、云服务开发、网络技术研究、自动化控制、智能驾驶算法等研发方向。本站将这些类别映射到既有学习路线和专业能力标准，不表示某一岗位当前仍开放；实际团队、地点、招聘类型、职责和技术栈以官网实时 JD 为准。

@@ -76,10 +76,17 @@ try {
   await field('target.roleTitle').fill('游戏客户端工程师'); await field('skills').fill('Unity、C#、Git、TypeScript、性能优化'); await field('certificates').fill('英语六级；软件设计竞赛二等奖');
   await field('target.jd').fill('必须熟练使用 Unity、C#，掌握网络同步、性能优化。了解 Unreal Engine 优先。');
   await field('target.hc').fill('游戏客户端岗位，负责网络同步与内存优化，要求单元测试经验。');
-  await next(); await page.locator('[data-resume-ai]').check(); await page.locator('[data-resume-generate]').click();
+  await next(); await expect(page.locator('[data-resume-polish]')).toBeVisible();
+  await page.locator('[data-resume-polish]').click(); await expect.poll(() => aiRequests.length).toBe(1);
+  await expect(page.locator('#toast')).toContainText('AI 已润色'); await expect(page.locator('.resume-paper')).toBeVisible();
+  await page.locator('[data-resume-ai]').check(); await page.locator('[data-resume-generate]').click();
   await expect(page.locator('.resume-paper')).toBeVisible(); await expect(page.locator('.resume-paper-photo')).toBeVisible();
   assert.equal((await draft()).generation.mode, 'ai'); assert.equal(aiRequests[0].model, 'claude-sonnet-4-6');
-  for (const secret of ['林知远', '13800138000', 'lin@example.com', 'data:image']) assert.ok(!JSON.stringify(aiRequests[0]).includes(secret));
+  await expect(page.locator('[data-resume-polish]')).toBeVisible();
+  await page.locator('[data-resume-polish]').click(); await expect.poll(() => aiRequests.length).toBe(3);
+  await expect(page.locator('#toast')).toContainText('AI 已润色');
+  assert.equal(aiRequests[2].target.jd, '必须熟练使用 Unity、C#，掌握网络同步、性能优化。了解 Unreal Engine 优先。');
+  for (const secret of ['林知远', '13800138000', 'lin@example.com', 'data:image']) for (const request of [aiRequests[0], aiRequests[2]]) assert.ok(!JSON.stringify(request).includes(secret));
   assert.ok(await page.locator('.resume-paper mark').count() > 0);
   await expect(page.locator('.resume-keywords.gap')).toContainText('Unreal Engine');
   assert.ok(!(await page.locator('.resume-paper').innerText()).includes('Unreal Engine'));
@@ -88,6 +95,10 @@ try {
   await bullet.fill('在线编辑：使用 Unity 验证网络同步，保留 2 人联机记录。');
   const editedText = () => page.locator(`[data-resume-edit="${editPath}"]`);
   await page.reload(); await expect(editedText()).toContainText('在线编辑');
+  await page.locator('[data-resume-polish]').click();
+  await expect(page.getByRole('button', { name: '确认 AI 润色', exact: true })).toBeVisible();
+  await expect(page.locator('.resume-local-note')).toContainText('在线编辑内容会被替换');
+  await page.getByRole('button', { name: '保留当前编辑', exact: true }).click(); await expect(editedText()).toContainText('在线编辑');
   await step(4).click();
   for (const template of RESUME_TEMPLATES) {
     await page.locator(`[data-resume-template-choice="${template.id}"]`).click();

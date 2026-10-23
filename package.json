@@ -18,7 +18,9 @@
     "test:growth": "node tests/growth.browser.mjs",
     "test:growth:layout": "node tests/growth-layout.browser.mjs",
     "test:resume": "node tests/resume.browser.mjs",
-    "test:catalog": "node tests/catalog.browser.mjs"
+    "test:catalog": "node tests/catalog.browser.mjs",
+    "test:videos": "node tests/video.browser.mjs",
+    "check:videos": "node scripts/check-video-links.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1"

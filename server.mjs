@@ -9,6 +9,7 @@ try { process.loadEnvFile(path.join(root, '.env.local')); } catch (error) { if (
 const port = Number(process.env.PORT || 4173);
 const publicFiles = new Set(['index.html', 'style.css', 'app.js', 'data.js', 'core.js', 'career-data.js', 'career-ui.js', 'project-data.js', 'project-ui.js', 'professional-data.js', 'growth-core.js', 'growth-ui.js', 'growth.css', 'favicon.svg']);
 const types = { '.html':'text/html; charset=utf-8', '.css':'text/css; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.svg':'image/svg+xml' };
+['video-data.js', 'video-ui.js', 'video.css'].forEach(name => publicFiles.add(name));
 const fileAliases = { 'vendor/jspdf.umd.min.js': 'node_modules/jspdf/dist/jspdf.umd.min.js', 'vendor/fflate.browser.js': 'node_modules/fflate/esm/browser.js' };
 ['resume-core.js', 'resume-ui.js', 'resume-export.js', 'resume-ai-core.js', 'resume-templates.js', 'mobility-data.js', 'resume.css', ...Object.keys(fileAliases)].forEach(name => publicFiles.add(name));
 function json(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }); res.end(JSON.stringify(body)); }

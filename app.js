@@ -2,6 +2,7 @@ import { createCareer } from './career-ui.js';
 import { createProjects } from './project-ui.js';
 import { createGrowth } from './growth-ui.js';
 import { createResume } from './resume-ui.js';
+import { mountVideoLearning } from './video-ui.js';
 import { paths, categories, resources, examTopics, examLinks, helpServices } from './data.js';
 import { escapeHtml as e, matchesQuery, progressFor, sanitizeState, buildExamPlan } from './core.js';
 let disposeHomeMotion = () => {};
@@ -170,6 +171,7 @@ function render() {
     const anchor=content.querySelector(route()==='home'?'.hero':'.page-header, .workspace-hero');
     anchor?.insertAdjacentHTML('afterend',growth.preview());
   }
+  mountVideoLearning(content, { page: route(), params: new URLSearchParams(location.hash.split('?')[1] || ''), resourcePath });
   disposeHomeMotion = mountHomeMotion();
   disposeFluidMotion = mountFluidMotion();
 }
@@ -187,7 +189,7 @@ function showPath(id,keepFocus=false) {
   const progress=progressFor(p,state), joined=state.joined.includes(id), related=resources.filter(r=>r.paths.includes(id));
   const markup=dialogHeader(p.en || 'POSTGRADUATE STUDY',p.title,p.desc)+`<div class="dialog-body"><div class="dialog-lead"><span id="dialog-progress">${progress.count}/${progress.total} 个阶段已完成 · ${progress.percent}%</span><button class="btn ${joined?'btn-secondary':'btn-primary'}" data-join="${id}">${icon(joined?'check':'calendar')}${joined?'已加入我的学习':'加入我的学习'}</button></div><ol class="stage-list">${p.stages.map(([title,desc],i)=>`<li class="stage-item ${(state.done[id]||[]).includes(i)?'completed':''}"><input class="stage-check" type="checkbox" id="stage-${i}" data-stage="${i}" data-item="${id}" ${(state.done[id]||[]).includes(i)?'checked':''}><label for="stage-${i}">${title}</label><p>${desc}</p></li>`).join('')}</ol>${curriculumMarkup(p)}${related.length?`<h3 class="dialog-subtitle">搭配这些资料开始学习</h3><div class="resource-list dialog-resources">${related.map(r=>resourceRow(r,true)).join('')}</div>`:''}${!p.id.startsWith('exam-')?projectLab.preview(p.id)+career.preview(p.id):''}<div class="notice">${icon('info')}<span>${p.id.startsWith('exam-')?'提纲用于组织复习，实际范围请核对目标专业当年考试要求。':'阶段顺序是一份起点，可以根据已有基础调整学习节奏。'} 勾选阶段会自动加入学习，记录保存在当前浏览器。</span></div></div>`;
   const enriched=markup.replace('<div class="dialog-body">','<div class="dialog-body">'+growth.preview(p.id));
-  if(keepFocus){document.getElementById('dialog-content').innerHTML=enriched;dialog.querySelector('[data-join]')?.focus({preventScroll:true});return;}showDialog(enriched);
+  if(keepFocus){document.getElementById('dialog-content').innerHTML=enriched;mountVideoLearning(document.getElementById('dialog-content'), { pathId: id });dialog.querySelector('[data-join]')?.focus({preventScroll:true});return;}showDialog(enriched);mountVideoLearning(document.getElementById('dialog-content'), { pathId: id });
 }
 function showGuide() {
   showDialog(dialogHeader('FIND YOUR STARTING POINT','从现在的你，找到下一步。','选择最接近你当前目标的一项。')+`<div class="dialog-body"><div class="guide-options"><button class="guide-option" data-guide="foundation">${icon('book')}<strong>我刚开始学习计算机</strong><p>先补齐程序、系统与算法基础，再选择具体方向。</p></button><button class="guide-option" data-guide="ai">${icon('bot')}<strong>我想进入 AI 与大模型</strong><p>按已有基础，从机器学习、深度学习走向模型与应用。</p></button><button class="guide-option" data-guide="engineering">${icon('code')}<strong>我想做出完整的产品</strong><p>从前后端到测试与交付，选择一条工程实践路线。</p></button><button class="guide-option" data-guide="exam">${icon('cap')}<strong>我正在准备计算机考研</strong><p>先核对目标考试科目，再安排专业课梳理与复习计划。</p></button></div><p class="onboarding-tip">暂时不确定也没关系。先打开一条路线，看看第一个任务是否适合现在的自己。</p></div>`);

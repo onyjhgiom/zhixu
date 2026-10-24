@@ -48,6 +48,12 @@ try {
   const careerBefore = await page.evaluate(() => localStorage.getItem('zhixu-career-v1'));
   await page.getByRole('link', { name: '智能简历生成', exact: true }).first().click();
   await expect(page.locator('#resume-builder')).toBeVisible();
+  await expect(field('aiModel')).toBeVisible();
+  await expect(field('aiModel')).toBeEnabled();
+  await expect(field('aiModel').locator('option[value="gpt-5.5"]')).toHaveCount(1);
+  await expect(field('aiModel').locator('option[value="codex-mini-latest"]')).toHaveCount(1);
+  await field('aiModel').selectOption('gpt-5.5'); assert.equal((await draft()).aiModel, 'gpt-5.5');
+  await field('aiModel').selectOption('');
   await next(); assert.equal((await draft()).step, 0);
   await field('basics.name').fill('林知远'); await field('basics.email').fill('lin@example.com'); await field('basics.phone').fill('13800138000'); await field('basics.city').fill('杭州');
   await field('basics.summary').fill('关注 Unity 客户端开发，以可验证的性能数据推进优化。');

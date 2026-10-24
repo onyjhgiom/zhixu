@@ -9,6 +9,7 @@ const SYSTEM_PROMPT = `你是一名中文简历编辑。根据候选人真实经
 只输出一个合法 JSON 对象，不要 Markdown，不要解释。格式：
 {"summary":"原有简介为空时返回空串，否则可保守润色","sections":[{"id":"原始模块 id","items":[{"index":0,"bullets":[{"text":"优化后的要点","sourceIndexes":[0]}]}]}],"suggestions":["给用户的具体补充建议，不能将建议写成简历既有事实"]}
 sections 必须完整包含输入中的所有模块，不要创建不存在的模块。bullets 为空时返回空数组。suggestions 最多 4 条。`;
+const MODEL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,99}$/;
 
 function config(env) {
   const protocol = env.RESUME_AI_PROTOCOL || 'messages';
@@ -45,7 +46,7 @@ export async function listResumeModels({ env = process.env, fetchImpl = fetch } 
       const body = await response.json();
       if (!Array.isArray(body.data)) throw new Error();
       for (const item of body.data) {
-        const valid = typeof item.id === 'string' && (protocol === 'chat-completions' ? /^gpt-[a-z0-9.-]+$/.test(item.id) : /^claude-[a-z0-9.-]+$/.test(item.id));
+        const valid = typeof item.id === 'string' && (protocol === 'chat-completions' ? MODEL_ID_PATTERN.test(item.id) && !/^claude-/i.test(item.id) : /^claude-[a-z0-9.-]+$/.test(item.id));
         if (valid && !models.some(model => model.id === item.id)) models.push({ id: item.id, name: typeof item.display_name === 'string' ? item.display_name.slice(0, 100) : typeof item.name === 'string' ? item.name.slice(0, 100) : item.id });
       }
       if (!body.has_more || !body.last_id || body.last_id === after) break;
@@ -72,7 +73,7 @@ export async function generateResumeWithAI(raw, { env = process.env, fetchImpl =
   const { base, headers, protocol, defaultModel } = config(env);
   const source = createResumeAISource(raw);
   const model = typeof raw?.model === 'string' && raw.model ? raw.model : defaultModel;
-  const validModel = protocol === 'chat-completions' ? /^gpt-[a-z0-9.-]{1,90}$/.test(model) : /^claude-[a-z0-9.-]{1,90}$/.test(model);
+  const validModel = protocol === 'chat-completions' ? MODEL_ID_PATTERN.test(model) && !/^claude-/i.test(model) : /^claude-[a-z0-9.-]{1,90}$/.test(model);
   if (!validModel) throw new ResumeAIError('INVALID_MODEL', protocol === 'chat-completions' ? '请选择有效的 GPT 模型。' : '请选择有效的 Claude 模型。', 400);
   const modern = /^claude-(?:fable|opus-(?:5|4-[78])|sonnet-5|haiku-5)/.test(model);
   const timeout = AbortSignal.timeout(timeoutMs);

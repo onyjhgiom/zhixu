@@ -110,15 +110,28 @@ test('OpenAI Chat Completions uses GPT-6 Astra, Bearer auth and validates assist
   await assert.rejects(generateResumeWithAI(createResumeAIRequest(candidate()), { env: openAIEnv, fetchImpl: async () => Response.json({ choices: [{ finish_reason: 'length', message: { content: '{}' } }] }) }), { code: 'AI_INVALID_RESPONSE' });
 });
 
-test('OpenAI model discovery filters provider models and defaults to GPT-6 Astra', async () => {
+test('OpenAI model discovery exposes every safe provider model and prefers GPT-6 Astra', async () => {
   const openAIEnv = { RESUME_AI_PROTOCOL: 'chat-completions', SUB2API_BASE_URL: 'https://openai-models.test/v1', SUB2API_API_KEY: 'openai-model-list-secret' };
   const result = await listResumeModels({ env: openAIEnv, fetchImpl: async url => {
     assert.equal(url, 'https://openai-models.test/v1/models');
-    return Response.json({ data: [{ id: 'gpt-5.5' }, { id: 'gpt-6-astra', name: 'GPT-6 Astra' }, { id: 'claude-sonnet-4-6' }, { id: 'codex-auto-review' }] });
+    return Response.json({ data: [{ id: 'gpt-5.5' }, { id: 'gpt-6-astra', name: 'GPT-6 Astra' }, { id: 'codex-mini-latest' }, { id: 'vendor/model-v2' }, { id: 'bad model' }, { id: 'claude-sonnet-4-6' }] });
   } });
-  assert.deepEqual(result.models.map(item => item.id), ['gpt-6-astra', 'gpt-5.5']);
+  assert.deepEqual(result.models.map(item => item.id), ['gpt-6-astra', 'gpt-5.5', 'vendor/model-v2', 'codex-mini-latest']);
   assert.equal(result.models[0].name, 'GPT-6 Astra');
   assert.equal(result.defaultModel, 'gpt-6-astra');
+});
+
+test('OpenAI Chat Completions accepts another listed model ID', async () => {
+  const modelEnv = { RESUME_AI_PROTOCOL: 'chat-completions', SUB2API_BASE_URL: 'https://openai-alternate.test/v1', SUB2API_API_KEY: 'alternate-model-test' };
+  let sentModel = '';
+  const fetchImpl = async (_url, options) => {
+    const body = JSON.parse(options.body); sentModel = body.model;
+    return Response.json({ choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(planFor(JSON.parse(body.messages[1].content))) } }] });
+  };
+  const result = await generateResumeWithAI({ ...createResumeAIRequest(candidate()), model: 'codex-mini-latest' }, { env: modelEnv, fetchImpl });
+  assert.equal(sentModel, 'codex-mini-latest');
+  assert.equal(result.model, 'codex-mini-latest');
+  await assert.rejects(generateResumeWithAI({ ...createResumeAIRequest(candidate()), model: 'claude-sonnet-4-6' }, { env: modelEnv, fetchImpl }), { code: 'INVALID_MODEL' });
 });
 
 test('model discovery chooses an available default when configured model is not in the pool', async () => {

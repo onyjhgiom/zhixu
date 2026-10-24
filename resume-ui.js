@@ -5,6 +5,7 @@ import { RESUME_TEMPLATES, getResumeTemplate, resumeTemplateStyle } from './resu
 
 // Resume drafts and delegated events stay separate from interview records.
 export function createResume({ paths = [], icon = () => '', e = value => String(value ?? ''), toast = () => {}, render = () => {} }) {
+  const modelIdPattern = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,99}$/;
   const storageKey = 'zhixu-resume-v1';
   let state;
   let storageAvailable = true;
@@ -24,7 +25,7 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
       const response = await fetch('./api/resume/models', { cache: 'no-store', signal: AbortSignal.timeout(20000) });
       if (!response.ok) throw new Error();
       const body = await response.json();
-      const available = array(body.models).filter(item => /^gpt-[a-z0-9.-]+$/.test(item?.id));
+      const available = array(body.models).filter(item => modelIdPattern.test(item?.id || ''));
       if (!available.length) throw new Error();
       models = available;
       defaultModel = typeof body.defaultModel === 'string' ? body.defaultModel : models[0].id;
@@ -43,7 +44,7 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
       state = sanitizeResumeState(fallback(roleId));
       storageAvailable = false;
     }
-    if (state.aiModel && !/^gpt-[a-z0-9.-]+$/.test(state.aiModel)) { state.aiModel = ''; persist(true); }
+    if (state.aiModel && !modelIdPattern.test(state.aiModel)) { state.aiModel = ''; persist(true); }
     if (!state.target?.roleId && roleId) state.target.roleId = roleId;
     const path = paths.find(item => item.id === state.target?.roleId || item.id === roleId);
     if (path && !state.target.roleTitle) state.target.roleTitle = path.title;
@@ -185,7 +186,7 @@ export function createResume({ paths = [], icon = () => '', e = value => String(
   function aiOptions() {
     const selected = state.aiModel || '';
     const options = models.some(item => item.id === selected) || !selected ? models : [{ id: selected, name: selected }, ...models];
-    return `<div class="resume-ai-settings"><label class="resume-switch"><input type="checkbox" data-resume-ai ${state.useAI ? 'checked' : ''}><span><strong>使用 AI 优化简历</strong><small>根据岗位需求润色已有经历，保留真实成果。</small></span></label><label class="resume-field"><span>GPT 模型</span><select class="field-control" data-resume-field="aiModel" ${state.useAI ? '' : 'disabled'}><option value="">默认 · ${esc(defaultModel)}</option>${options.map(item => `<option value="${esc(item.id)}" ${selected === item.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select></label>${modelsStatus === 'loading' ? '<small role="status">正在获取可用模型…</small>' : modelsStatus === 'error' ? '<small>模型列表暂不可用，请检查服务配置后重试。</small><button type="button" class="text-link" data-resume-models-retry>重新加载模型</button>' : ''}<p class="resume-ai-privacy">AI 将处理经历、技能与岗位需求文本；姓名、联系方式和照片保留在本地。</p></div>`;
+    return `<div class="resume-ai-settings"><label class="resume-switch"><input type="checkbox" data-resume-ai ${state.useAI ? 'checked' : ''}><span><strong>使用 AI 优化简历</strong><small>根据岗位需求润色已有经历，保留真实成果。</small></span></label><label class="resume-field"><span>模型</span><select class="field-control" data-resume-field="aiModel" ${state.useAI ? '' : 'disabled'}><option value="">默认 · ${esc(defaultModel)}</option>${options.map(item => `<option value="${esc(item.id)}" ${selected === item.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select></label>${modelsStatus === 'loading' ? '<small role="status">正在获取可用模型…</small>' : modelsStatus === 'error' ? '<small>模型列表暂不可用，请检查服务配置后重试。</small><button type="button" class="text-link" data-resume-models-retry>重新加载模型</button>' : ''}<p class="resume-ai-privacy">AI 将处理经历、技能与岗位需求文本；姓名、联系方式和照片保留在本地。</p></div>`;
   }
   function formStep() {
     if (state.step === 0) return basicStep();

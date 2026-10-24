@@ -12,23 +12,30 @@ sections 必须完整包含输入中的所有模块，不要创建不存在的�
 
 function config(env) {
   const protocol = env.RESUME_AI_PROTOCOL || 'messages';
-  if (!['messages', 'responses'].includes(protocol)) throw new ResumeAIError('AI_CONFIGURATION_ERROR', 'AI 服务协议配置有误，请检查服务端配置。', 503);
-  const token = protocol === 'responses' ? env.SUB2API_API_KEY || env.ANTHROPIC_AUTH_TOKEN || env.ANTHROPIC_API_KEY : env.ANTHROPIC_AUTH_TOKEN || env.ANTHROPIC_API_KEY || env.SUB2API_API_KEY;
+  if (!['messages', 'responses', 'chat-completions'].includes(protocol)) throw new ResumeAIError('AI_CONFIGURATION_ERROR', 'AI 服务协议配置有误，请检查服务端配置。', 503);
+  const token = protocol === 'chat-completions'
+    ? env.OPENAI_API_KEY || env.SUB2API_API_KEY
+    : protocol === 'responses'
+      ? env.SUB2API_API_KEY || env.ANTHROPIC_AUTH_TOKEN || env.ANTHROPIC_API_KEY
+      : env.ANTHROPIC_AUTH_TOKEN || env.ANTHROPIC_API_KEY || env.SUB2API_API_KEY;
   if (!token) throw new ResumeAIError('AI_NOT_CONFIGURED', 'AI 服务尚未配置，可先使用本地排版。', 503);
   let base;
   try {
-    const address = env.SUB2API_BASE_URL || env.ANTHROPIC_BASE_URL || (protocol === 'messages' ? 'https://api.anthropic.com' : '');
+    const address = env.OPENAI_BASE_URL || env.SUB2API_BASE_URL || env.ANTHROPIC_BASE_URL || (protocol === 'messages' ? 'https://api.anthropic.com' : protocol === 'chat-completions' ? 'https://api.openai.com' : '');
     const url = new URL(address);
     if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) throw new Error();
     base = url.href.replace(/\/+$/, '').replace(/\/v1$/, '');
   } catch { throw new ResumeAIError('AI_CONFIGURATION_ERROR', 'AI 服务配置有误，请检查服务端配置。', 503); }
-  const auth = protocol === 'responses' ? { Authorization: 'Bearer ' + token } : { 'x-api-key': token, 'anthropic-version': '2023-06-01' };
-  return { base, protocol, token, defaultModel: env.ANTHROPIC_MODEL || (protocol === 'responses' ? 'claude-sonnet-4-6' : 'claude-fable-5-1'), headers: { 'Content-Type': 'application/json', ...auth } };
+  const auth = protocol === 'messages' ? { 'x-api-key': token, 'anthropic-version': '2023-06-01' } : { Authorization: 'Bearer ' + token };
+  const defaultModel = protocol === 'chat-completions'
+    ? env.OPENAI_MODEL || env.SUB2API_MODEL || 'gpt-6-astra'
+    : env.ANTHROPIC_MODEL || (protocol === 'responses' ? 'claude-sonnet-4-6' : 'claude-fable-5-1');
+  return { base, protocol, token, defaultModel, headers: { 'Content-Type': 'application/json', ...auth } };
 }
 let modelCache;
 export async function listResumeModels({ env = process.env, fetchImpl = fetch } = {}) {
   const { base, headers, protocol, token, defaultModel: configuredModel } = config(env);
-  const result = models => ({ models, defaultModel: models.some(model => model.id === configuredModel) ? configuredModel : protocol === 'responses' ? models.find(model => model.id === 'claude-sonnet-4-6')?.id || models[0].id : models[0].id });
+  const result = models => ({ models, defaultModel: models.some(model => model.id === configuredModel) ? configuredModel : protocol === 'chat-completions' ? models.find(model => model.id === 'gpt-6-astra')?.id || models[0].id : protocol === 'responses' ? models.find(model => model.id === 'claude-sonnet-4-6')?.id || models[0].id : models[0].id });
   if (modelCache && modelCache.base === base && modelCache.protocol === protocol && modelCache.token === token && Date.now() - modelCache.at < 300000) return result(modelCache.models);
   try {
     const models = []; let after;
@@ -37,12 +44,15 @@ export async function listResumeModels({ env = process.env, fetchImpl = fetch } 
       if (!response.ok) { await response.body?.cancel(); throw new Error(); }
       const body = await response.json();
       if (!Array.isArray(body.data)) throw new Error();
-      for (const item of body.data) if (typeof item.id === 'string' && /^claude-[a-z0-9.-]+$/.test(item.id) && !models.some(model => model.id === item.id)) models.push({ id: item.id, name: typeof item.display_name === 'string' ? item.display_name.slice(0, 100) : item.id });
+      for (const item of body.data) {
+        const valid = typeof item.id === 'string' && (protocol === 'chat-completions' ? /^gpt-[a-z0-9.-]+$/.test(item.id) : /^claude-[a-z0-9.-]+$/.test(item.id));
+        if (valid && !models.some(model => model.id === item.id)) models.push({ id: item.id, name: typeof item.display_name === 'string' ? item.display_name.slice(0, 100) : typeof item.name === 'string' ? item.name.slice(0, 100) : item.id });
+      }
       if (!body.has_more || !body.last_id || body.last_id === after) break;
       after = body.last_id;
     }
     if (!models.length) throw new Error();
-    const preferred = ['claude-fable-5-1', 'claude-opus-5-5', 'claude-fable-5', 'claude-opus-5', 'claude-sonnet-5-5'];
+    const preferred = protocol === 'chat-completions' ? ['gpt-6-astra', 'gpt-6.1-sol', 'gpt-6', 'gpt-5.6', 'gpt-5.5'] : ['claude-fable-5-1', 'claude-opus-5-5', 'claude-fable-5', 'claude-opus-5', 'claude-sonnet-5-5'];
     models.sort((a, b) => (preferred.includes(a.id) ? preferred.indexOf(a.id) : 100) - (preferred.includes(b.id) ? preferred.indexOf(b.id) : 100) || b.id.localeCompare(a.id, 'en', { numeric: true }));
     modelCache = { base, protocol, token, models, at: Date.now() };
     return result(models);
@@ -62,15 +72,19 @@ export async function generateResumeWithAI(raw, { env = process.env, fetchImpl =
   const { base, headers, protocol, defaultModel } = config(env);
   const source = createResumeAISource(raw);
   const model = typeof raw?.model === 'string' && raw.model ? raw.model : defaultModel;
-  if (!/^claude-[a-z0-9.-]{1,90}$/.test(model)) throw new ResumeAIError('INVALID_MODEL', '请选择有效的 Claude 模型。', 400);
+  const validModel = protocol === 'chat-completions' ? /^gpt-[a-z0-9.-]{1,90}$/.test(model) : /^claude-[a-z0-9.-]{1,90}$/.test(model);
+  if (!validModel) throw new ResumeAIError('INVALID_MODEL', protocol === 'chat-completions' ? '请选择有效的 GPT 模型。' : '请选择有效的 Claude 模型。', 400);
   const modern = /^claude-(?:fable|opus-(?:5|4-[78])|sonnet-5|haiku-5)/.test(model);
   const timeout = AbortSignal.timeout(timeoutMs);
   const payload = protocol === 'responses'
     ? { model, instructions: SYSTEM_PROMPT, input: [{ role: 'user', content: [{ type: 'input_text', text: JSON.stringify(source) }] }], max_output_tokens: 16384, store: false, stream: false }
-    : { model, max_tokens: 16384, ...(modern ? { output_config: { effort: 'max' } } : { temperature: 0.2 }), system: SYSTEM_PROMPT, messages: [{ role: 'user', content: JSON.stringify(source) }] };
+    : protocol === 'chat-completions'
+      ? { model, messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content: JSON.stringify(source) }], store: false, stream: false }
+      : { model, max_tokens: 16384, ...(modern ? { output_config: { effort: 'max' } } : { temperature: 0.2 }), system: SYSTEM_PROMPT, messages: [{ role: 'user', content: JSON.stringify(source) }] };
   let response, body;
   try {
-    response = await fetchImpl(base + '/v1/' + protocol, {
+    const endpoint = protocol === 'chat-completions' ? '/v1/chat/completions' : '/v1/' + protocol;
+    response = await fetchImpl(base + endpoint, {
       method: 'POST', redirect: 'error', signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
       headers,
       body: JSON.stringify(payload)
@@ -83,10 +97,14 @@ export async function generateResumeWithAI(raw, { env = process.env, fetchImpl =
   }
   if (!response.ok || body?.error) throw upstreamFailure(response.status, body);
   try {
-    if (!body || (protocol === 'responses' ? body.status !== 'completed' : body.stop_reason === 'max_tokens')) throw new Error();
+    const choice = protocol === 'chat-completions' ? body?.choices?.[0] : null;
+    if (!body || (protocol === 'responses' ? body.status !== 'completed' : protocol === 'chat-completions' ? !choice || choice.finish_reason === 'length' : body.stop_reason === 'max_tokens')) throw new Error();
+    const chatContent = choice?.message?.content;
     const content = protocol === 'responses'
       ? body.output.filter(item => item.type === 'message' && item.role === 'assistant').flatMap(item => item.content || []).filter(part => part.type === 'output_text').map(part => ({ type: 'text', text: part.text }))
-      : body.content;
+      : protocol === 'chat-completions'
+        ? typeof chatContent === 'string' ? [{ type: 'text', text: chatContent }] : Array.isArray(chatContent) ? chatContent.filter(part => typeof part?.text === 'string').map(part => ({ type: 'text', text: part.text })) : []
+        : body.content;
     const text = content.filter(part => part.type === 'text').map(part => part.text).join('\n').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
     const plan = validateResumeAIPlan(source, JSON.parse(text));
     return { plan, model, generatedAt: new Date().toISOString() };

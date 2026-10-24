@@ -26,13 +26,13 @@
 - 预览中可直接编辑姓名、联系方式、模块标题和经历文字，刷新后保留；表单修改会提示预览待更新。重新生成前可选择保留在线编辑，避免意外覆盖。
 - 下载 A4 PDF 或 2 倍分辨率 PNG，长简历自动分页，多页 PNG 打包为 ZIP 一次下载。中文、照片与在线编辑内容均进入导出；PDF 使用页面图像，暂不提供可搜索的文本层。
 
-生成预览默认使用本地排版。用户开启 AI 后，服务端使用 Sub2API Responses 协议，默认模型为 `claude-sonnet-4-6`，生成请求关闭响应存储。模型列表只说明服务商声明的模型 ID，不代表上游账号当前可用。出现账号池耗尽或上游拒绝时，页面显示对应说明并保留原预览，仍可选择本地排版。
+生成预览默认使用本地排版。用户开启 AI 后，服务端通过 OpenAI 兼容的 Chat Completions 协议调用 GPT，默认模型为 `gpt-6-astra`；模型列表按服务商实际返回展示。列表只说明服务商声明的模型 ID，不代表上游账号当前可用。生成失败时页面显示对应说明并保留原预览，仍可选择本地排版。
 
 AI 请求只包含经历、技能、简介与岗位文本，独立的姓名、联系方式、所在城市、主页和照片字段不发送给接口。已有经历仍可能包含个人信息，按填写内容处理。姓名、联系方式、照片和生成草稿由本地表单合并；服务器不持久保存请求或响应。AI 结果按原始经历下标关联，保留学校、单位、职位、时间和证书，对新增技能关键词、数字变化、遗漏经历与无效结构做校验；校验不能替代本人对表达真实性的复核。匹配覆盖度仍按本地表单证据计算，不代表录用概率。原有题库、复盘、学习与成长记录使用原存储键。
 
-服务端自动读取项目根目录的 `.env.local`，已加入 Git 忽略列表且不对浏览器公开。Sub2API 配置使用 `RESUME_AI_PROTOCOL=responses`、`SUB2API_BASE_URL`、`SUB2API_API_KEY`、`ANTHROPIC_MODEL`，以 Bearer 认证请求 `/v1/responses`；`store` 固定为 `false`。原生 Anthropic Messages 配置仍支持 `ANTHROPIC_BASE_URL` 与 `ANTHROPIC_AUTH_TOKEN`。密钥仅用于服务端认证；修改配置后重启 Node 服务。
+服务端自动读取项目根目录的 `.env.local`，已加入 Git 忽略列表且不对浏览器公开。当前 GPT 配置使用 `RESUME_AI_PROTOCOL=chat-completions`、`SUB2API_BASE_URL`、`SUB2API_API_KEY` 和 `OPENAI_MODEL=gpt-6-astra`，以 Bearer 认证请求 `/v1/chat/completions`，并传入 `store: false`。仍兼容 Sub2API Responses 与 Anthropic Messages 协议；切换协议时需同步设置对应的服务端环境变量。密钥仅用于服务端认证；修改配置后重启 Node 服务。
 
-2026-10-22 联调状态：新密钥的模型列表返回 13 个 Claude 模型；指定的 `claude-sonnet-4-6` 经 `/v1/responses` 返回 HTTP 403 `All available accounts exhausted`，Messages 请求返回上游访问拒绝。Responses API 协议已按提供的 Sub2API 配置接入，但真实简历生成仍需服务商恢复可用上游账号。
+2026-10-24 联调：附带密钥的 `/v1/models` 成功返回 GPT 模型列表；以 `gpt-6-astra` 对无个人信息的测试简历完成了真实生成与结果校验。
 
 `resume-core.js` 提供状态清洗、表单校验、关键词分析与文档生成，`resume-ai-core.js` 提供请求脱敏和响应校验，`resume-ai.mjs` 负责服务端模型列表与生成调用，`resume-ui.js` / `resume.css` 提供页面与编辑，`resume-export.js` 负责浏览器排版、分页与导出。PDF 依赖本地安装的 jsPDF，按需通过静态服务的明确白名单路径加载，无外部 CDN 请求。
 
@@ -49,7 +49,7 @@ AI 请求只包含经历、技能、简介与岗位文本，独立的姓名、�
 
 诊断使用透明的本地规则。知识题只能提供有限知识信号，最高对应 L2；工程交付和方案设计的 L3/L4 需要进一步作品评审。自评、任务勾选与客观答题分别保存，未评估项保持未知。匹配显示已测部分达成度、覆盖率及未知区间，不代表录取概率。
 
-新增 `professional-data.js`（内容）、`growth-core.js`（诊断和排程）、`growth-ui.js`（页面和本地交互）、`growth.css`（主题与响应式样式）。沿用原生 ES Modules、现有 hash 路由；成长记录独立保存在 `zhixu-growth-v1`，原学习、收藏及面试记录保持原有键与结构。成长诊断采用本地规则；简历模块另提供服务端 Claude 接口。暂无账户、跨设备同步或服务器作品评审。
+新增 `professional-data.js`（内容）、`growth-core.js`（诊断和排程）、`growth-ui.js`（页面和本地交互）、`growth.css`（主题与响应式样式）。沿用原生 ES Modules、现有 hash 路由；成长记录独立保存在 `zhixu-growth-v1`，原学习、收藏及面试记录保持原有键与结构。成长诊断采用本地规则；简历模块另提供服务端 GPT 接口。暂无账户、跨设备同步或服务器作品评审。
 
 验证：`npm test` 覆盖原有逻辑与新增内容、诊断边界、未知值、状态清洗、依赖排程及记录恢复；`npm run test:growth` 覆盖新增页面交互，`npm run test:growth:layout` 检查全部新方向与岗位页面的双主题、响应式布局。已有浏览器测试继续保留。运行中的旧静态服务需重启，以加载新的公开文件白名单。
 

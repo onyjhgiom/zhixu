@@ -90,6 +90,37 @@ test('Sub2API Responses uses Bearer auth, stateless payload and extracts assista
   await assert.rejects(generateResumeWithAI(createResumeAIRequest(candidate()), { env: responseEnv, fetchImpl: async () => Response.json({ error: { message: 'Upstream access forbidden, please contact administrator' } }, { status: 502 }) }), { code: 'AI_UPSTREAM_FORBIDDEN' });
 });
 
+test('OpenAI Chat Completions uses GPT-6 Astra, Bearer auth and validates assistant JSON', async () => {
+  const calls = [];
+  const openAIEnv = { RESUME_AI_PROTOCOL: 'chat-completions', SUB2API_BASE_URL: 'https://openai-example.test/v1', SUB2API_API_KEY: 'openai-secret', OPENAI_MODEL: 'gpt-6-astra', ANTHROPIC_MODEL: 'claude-sonnet-4-6' };
+  const fetchImpl = async (url, options) => {
+    const body = JSON.parse(options.body); calls.push({ url, options, body });
+    const source = JSON.parse(body.messages[1].content);
+    return Response.json({ model: body.model, choices: [{ finish_reason: 'stop', message: { role: 'assistant', content: JSON.stringify(planFor(source)) } }] });
+  };
+  const result = await generateResumeWithAI(createResumeAIRequest(candidate()), { env: openAIEnv, fetchImpl });
+  assert.equal(result.model, 'gpt-6-astra');
+  assert.equal(calls[0].url, 'https://openai-example.test/v1/chat/completions');
+  assert.equal(calls[0].options.headers.Authorization, 'Bearer openai-secret');
+  assert.equal(calls[0].options.headers['x-api-key'], undefined);
+  assert.equal(calls[0].body.messages[0].role, 'system');
+  assert.equal(calls[0].body.messages[1].role, 'user');
+  assert.equal(calls[0].body.store, false);
+  assert.equal(calls[0].body.stream, false);
+  await assert.rejects(generateResumeWithAI(createResumeAIRequest(candidate()), { env: openAIEnv, fetchImpl: async () => Response.json({ choices: [{ finish_reason: 'length', message: { content: '{}' } }] }) }), { code: 'AI_INVALID_RESPONSE' });
+});
+
+test('OpenAI model discovery filters provider models and defaults to GPT-6 Astra', async () => {
+  const openAIEnv = { RESUME_AI_PROTOCOL: 'chat-completions', SUB2API_BASE_URL: 'https://openai-models.test/v1', SUB2API_API_KEY: 'openai-model-list-secret' };
+  const result = await listResumeModels({ env: openAIEnv, fetchImpl: async url => {
+    assert.equal(url, 'https://openai-models.test/v1/models');
+    return Response.json({ data: [{ id: 'gpt-5.5' }, { id: 'gpt-6-astra', name: 'GPT-6 Astra' }, { id: 'claude-sonnet-4-6' }, { id: 'codex-auto-review' }] });
+  } });
+  assert.deepEqual(result.models.map(item => item.id), ['gpt-6-astra', 'gpt-5.5']);
+  assert.equal(result.models[0].name, 'GPT-6 Astra');
+  assert.equal(result.defaultModel, 'gpt-6-astra');
+});
+
 test('model discovery chooses an available default when configured model is not in the pool', async () => {
   const modelEnv = { RESUME_AI_PROTOCOL: 'responses', SUB2API_BASE_URL: 'https://models-fallback.test/v1', SUB2API_API_KEY: 'model-fallback-test', ANTHROPIC_MODEL: 'claude-fable-5-1' };
   const result = await listResumeModels({ env: modelEnv, fetchImpl: async () => Response.json({ data: [{ id: 'claude-sonnet-4-6' }, { id: 'claude-opus-5-5' }] }) });

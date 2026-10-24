@@ -13,14 +13,14 @@ const context = await browser.newContext({ viewport: { width: 1440, height: 1080
 const aiRequests = [];
 let aiBehavior = 'success';
 let modelsBehavior = 'success';
-await context.route('**/api/resume/models', route => modelsBehavior === 'failure' ? route.fulfill({ status: 503, json: { error: { message: '模型列表暂不可用' } } }) : route.fulfill({ json: { defaultModel: 'claude-sonnet-4-6', models: [{ id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6' }, { id: 'claude-opus-5-5', name: 'Claude Opus 5.5' }] } }));
+await context.route('**/api/resume/models', route => modelsBehavior === 'failure' ? route.fulfill({ status: 503, json: { error: { message: '模型列表暂不可用' } } }) : route.fulfill({ json: { defaultModel: 'gpt-6-astra', models: [{ id: 'gpt-6-astra', name: 'GPT-6 Astra' }, { id: 'gpt-5.5', name: 'GPT-5.5' }] } }));
 await context.route('**/api/resume/generate', async route => {
   const request = route.request().postDataJSON(); aiRequests.push(request);
   if (aiBehavior === 'failure') return route.fulfill({ status: 503, json: { error: { code: 'AI_ACCOUNTS_UNAVAILABLE', message: '接口服务商当前没有可用的上游账号。请联系服务商恢复该分组的可用账号。' } } });
   if (aiBehavior === 'slow') await new Promise(resolve => setTimeout(resolve, 1000));
   const source = createResumeAISource(request);
   const plan = { summary: source.summary, sections: source.sections.map(section => ({ id: section.id, items: section.items.map((item, index) => ({ index, bullets: item.bullets.map((bullet, index) => ({ text: bullet.text, sourceIndexes: [index] })) })) })), suggestions: ['补充可核验的项目验收记录。'] };
-  return route.fulfill({ json: { plan, model: request.model || 'claude-sonnet-4-6' } }).catch(() => {});
+  return route.fulfill({ json: { plan, model: request.model || 'gpt-6-astra' } }).catch(() => {});
 });
 const page = await context.newPage(), errors = [];
 page.on('pageerror', error => errors.push(error.message));
@@ -81,7 +81,7 @@ try {
   await expect(page.locator('#toast')).toContainText('AI 已润色'); await expect(page.locator('.resume-paper')).toBeVisible();
   await page.locator('[data-resume-ai]').check(); await page.locator('[data-resume-generate]').click();
   await expect(page.locator('.resume-paper')).toBeVisible(); await expect(page.locator('.resume-paper-photo')).toBeVisible();
-  assert.equal((await draft()).generation.mode, 'ai'); assert.equal(aiRequests[0].model, 'claude-sonnet-4-6');
+  assert.equal((await draft()).generation.mode, 'ai'); assert.equal(aiRequests[0].model, 'gpt-6-astra');
   await expect(page.locator('[data-resume-polish]')).toBeVisible();
   await page.locator('[data-resume-polish]').click(); await expect.poll(() => aiRequests.length).toBe(3);
   await expect(page.locator('#toast')).toContainText('AI 已润色');
@@ -164,9 +164,9 @@ try {
   const archive = await download('png', 'artifacts/resume-multipage-PNG.zip');
   const images = Object.values(unzipSync(archive)); assert.equal(images.length, pages.length);
   assert.ok(images.every(image => Buffer.from(image).subarray(1, 4).toString() === 'PNG'));
-  await field('aiModel').selectOption('claude-opus-5-5'); await page.locator('[data-resume-generate]').click();
-  await expect(page.locator('.resume-ai-result')).toContainText('claude-opus-5-5');
-  await page.reload(); assert.equal((await draft()).generation.model, 'claude-opus-5-5');
+  await field('aiModel').selectOption('gpt-5.5'); await page.locator('[data-resume-generate]').click();
+  await expect(page.locator('.resume-ai-result')).toContainText('gpt-5.5');
+  await page.reload(); assert.equal((await draft()).generation.model, 'gpt-5.5');
   const preserved = (await draft()).document;
   aiBehavior = 'failure'; await page.locator('[data-resume-generate]').click();
   await expect(page.locator('.resume-ai-error')).toContainText('没有可用的上游账号');
@@ -200,12 +200,12 @@ try {
   await page.locator('[data-resume-template-choice="folio"]').click();
   modelsBehavior = 'failure'; await page.reload();
   await expect(page.locator('.resume-ai-settings')).toContainText('模型列表暂不可用');
-  await expect(field('aiModel').locator('option[value="claude-sonnet-4-6"]')).toHaveCount(1);
-  await expect(field('aiModel').locator('option[value="claude-opus-5-5"]')).toHaveCount(1);
-  await page.locator('[data-resume-ai]').check(); await field('aiModel').selectOption('claude-opus-5-5');
+  await expect(field('aiModel').locator('option[value="gpt-6-astra"]')).toHaveCount(1);
+  await expect(field('aiModel').locator('option[value="gpt-5.5"]')).toHaveCount(1);
+  await page.locator('[data-resume-ai]').check(); await field('aiModel').selectOption('gpt-5.5');
   modelsBehavior = 'success'; await page.locator('[data-resume-models-retry]').click();
   await expect(page.locator('[data-resume-models-retry]')).toHaveCount(0);
-  await expect(field('aiModel')).toHaveValue('claude-opus-5-5');
+  await expect(field('aiModel')).toHaveValue('gpt-5.5');
   aiBehavior = 'success';
   assert.equal(await page.evaluate(() => localStorage.getItem('zhixu-career-v1')), careerBefore);
   await page.getByRole('link', { name: '返回笔试与面试', exact: false }).click(); await expect(page.locator('.question-card')).toHaveCount(4);

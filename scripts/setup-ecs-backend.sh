@@ -46,8 +46,8 @@ else
   echo "✓ 已用 nohup 启动，日志 /var/log/zhixu.log（重启会丢失，建议装 pm2: npm i -g pm2）"
 fi
 
-sleep 2
+sleep 3
 echo "== 6) 自检本机 /api/resume/models =="
-curl -s --max-time 10 http://127.0.0.1:4173/api/resume/models | head -c 500
+curl -s --max-time 10 http://127.0.0.1:4173/api/resume/models | head -c 500 || true
 echo
 echo "=== 完成后，请按文档在 nginx 增加 /api 反代并 reload（见聊天里的 nginx 配置）==="

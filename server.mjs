@@ -59,4 +59,5 @@ export function createSiteServer({ generateResume = generateResumeWithAI, listMo
   } catch { res.writeHead(400); res.end('Bad request'); }
   });
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) createSiteServer().listen(port, '127.0.0.1', () => console.log(`知序已启动：http://127.0.0.1:${port}`));
+const invokedDirectly = (process.argv[1] && fileURLToPath(import.meta.url).split('/').pop() === String(process.argv[1]).split('/').pop()) || Boolean(process.env.PM2) || process.env.pm_id !== undefined;
+if (invokedDirectly) createSiteServer().listen(port, '127.0.0.1', () => console.log(`知序已启动：http://127.0.0.1:${port}`));

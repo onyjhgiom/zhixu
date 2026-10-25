@@ -37,7 +37,9 @@ export function createSiteServer({ generateResume = generateResumeWithAI, listMo
     if (url.pathname === '/api/resume/generate') {
       if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); json(res, 405, { error: { code: 'METHOD_NOT_ALLOWED', message: '请使用页面中的生成按钮。' } }); return; }
       const host = req.headers.host || '';
-      if (!/^(?:127\.0\.0\.1|localhost)(?::\d+)?$/.test(host) || (req.headers.origin && req.headers.origin !== 'http://' + host)) { json(res, 403, { error: { code: 'ORIGIN_REJECTED', message: '仅接受当前网站发起的简历请求。' } }); return; }
+      const origin = req.headers.origin || '';
+      const originIsSameSite = !origin || origin === 'http://' + host || origin === 'https://' + host;
+      if (!originIsSameSite) { json(res, 403, { error: { code: 'ORIGIN_REJECTED', message: '仅接受当前网站发起的简历请求。' } }); return; }
       if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) { json(res, 415, { error: { code: 'INVALID_CONTENT_TYPE', message: '请求格式错误，请刷新页面后重试。' } }); return; }
       if (activeGenerations >= 2) { json(res, 429, { error: { code: 'AI_BUSY', message: '正在生成其他简历，请稍后再试。' } }); return; }
       activeGenerations++;
